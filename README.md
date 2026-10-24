@@ -38,6 +38,8 @@ Demo account: `demo@linkup.to` / `linkup-demo` (or "Use the demo account" on the
 ## What works
 
 - **Accounts:** sign up, sign in, sign out, change name, email and password, delete the account (which frees the address). Passwords are hashed with PBKDF2 in the browser; this is a demo, not real security.
+- **Demo backend rules:** every save is validated and normalised the way a server would (length limits, only web, mail and phone links, photos up to 400 KB). The stored data has a schema version with migrations; data it cannot read is copied to `linkup:db:backup` before starting fresh. An edit made in another tab is never silently overwritten: the editor shows "Edited in another tab" with a Reload action. Signing in or out in one tab is followed by the others, and unsaved edits in a tab survive an ended session when the same account signs back in there.
+- **Phones:** built for one hand at 360 px and up: Publish in the bottom tab bar, a section strip and Preview dock in the editor, touch reading on charts, 44 px targets, safe areas.
 - **Address:** 3 to 30 characters (lowercase letters, numbers, dots, underscores), checked live; app paths such as `app` or `settings` are reserved.
 - **Editor:** photo upload (cropped and resized to 512 px), name, tagline, bio and location with counters; up to 8 links with drag or keyboard reorder, hide without deleting, duplicate, delete with undo, and URL checks with a one-tap `https://` fix; six social icons; three grounds, seven plastic tints, three button styles and three shapes. Edits autosave to a draft; **Publish** makes them live.
 - **Public page:** only published content is served. Links open in a new tab and only `http(s)`, `mailto` and `tel` links are rendered as links.

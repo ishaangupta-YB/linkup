@@ -27,6 +27,8 @@
   background: color-mix(in oklab, var(--color-error) 8%, var(--glint)); color: var(--color-error);
   font-size: var(--text-sm); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-error) 30%, transparent);
 }
+/* A neutral notice: why the person was sent here. Grey, never alarm red (Dose). */
+.auth__note { padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-input); background: var(--color-paper-2); color: var(--color-ink-2); font-size: var(--text-sm); box-shadow: inset 0 0 0 1px var(--color-rule); }
 .auth__form[role="alert"] { justify-items: start; }
 
 .auth__link {

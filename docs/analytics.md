@@ -24,6 +24,8 @@ Every event is one flat JSON object, schema version 1 (`src/analytics/events.ts`
 Page events: `page_view`, `link_click`, `social_click`, `share_click`.
 App events: `signed_up`, `signed_in`, `signed_out`, `handle_claimed`, `editor_opened`, `link_added`, `link_removed`, `link_reordered`, `look_changed`, `preview_opened`, `page_published`, `page_unpublished`, `address_copied`, `dashboard_viewed`, `dashboard_range_changed`, `events_exported`, `landing_cta_clicked`, `account_deleted`.
 
+`link_reordered` carries `via`: `drag`, `keyboard` or `menu`. In the dashboard's hourly view, the hour that repeats when clocks go back is keyed with a `b` suffix (`T01b`).
+
 `source` comes from `utm_source` when present, else from the referrer's site (Instagram, LinkedIn, WhatsApp, YouTube, X, Facebook, Google and others), else `Direct`. `country` is guessed from the browser's time zone, which is coarse; a server should use the request's IP region instead.
 
 ## Privacy

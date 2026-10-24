@@ -8,7 +8,7 @@ import { AddressLabel, AuthLayout } from './AuthLayout'
 import { nextOnEnter, useKeepSubmitInView } from './formKeys'
 import { PasswordField } from './PasswordField'
 
-type LocationState = { from?: string; email?: string } | null
+type LocationState = { from?: string; email?: string; message?: string } | null
 
 /** Only paths inside this app; never an outside URL from history state. */
 function safeFrom(from: unknown) {
@@ -75,6 +75,12 @@ export default function SignInPage() {
       band={<AddressLabel handle="" note="Your address stays the same every time you publish." />}
     >
       <form ref={formRef} className="auth__form" onSubmit={onSubmit} noValidate>
+        {/* Why the person landed here, when the guard sent them (signed out in another tab, session ended). */}
+        {typeof state?.message === 'string' && state.message && (
+          <p className="auth__note" role="status">
+            {state.message}
+          </p>
+        )}
         <TextField
           ref={emailRef}
           label="Email"
