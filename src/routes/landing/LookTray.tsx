@@ -80,7 +80,7 @@ export function LookTray() {
           </div>
         </div>
         <div className="looks__stage">
-          <Phone className="looks__phone" content={content} handle={DEMO_ACCOUNT.handle} label="The demo page with the look you picked, scrollable" />
+          <Phone className="looks__phone" content={content} handle={DEMO_ACCOUNT.handle} label="The demo page with the look you picked" />
         </div>
       </div>
     </section>

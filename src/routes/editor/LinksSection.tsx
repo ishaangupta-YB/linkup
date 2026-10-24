@@ -126,7 +126,9 @@ export function LinksSection({ draft, update, meta }: SectionProps) {
 
   /** Pixels to scroll this frame: negative near the top edge (under the sticky bars), positive near the bottom (over the tab bar). */
   function edgeStep(y: number) {
-    const bottom = window.innerHeight - EDGE
+    // Auto-scroll starts above the tab bar, which covers the bottom of the screen on phones.
+    const floor = document.querySelector('.shell__tabbar')?.getBoundingClientRect().top ?? window.innerHeight
+    const bottom = Math.min(window.innerHeight, floor > 0 ? floor : window.innerHeight) - EDGE
     if (y < EDGE_TOP) return -Math.ceil(((EDGE_TOP - y) / EDGE_TOP) * MAX_STEP)
     if (y > bottom) return Math.ceil(((y - bottom) / EDGE) * MAX_STEP)
     return 0

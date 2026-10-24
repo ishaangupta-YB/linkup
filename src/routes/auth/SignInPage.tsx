@@ -101,7 +101,7 @@ export default function SignInPage() {
             setEmail(e.target.value)
             setError(null)
           }}
-          onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+          onBlur={() => email.trim() && setTouched((t) => ({ ...t, email: true }))}
           error={touched.email ? emailIssue : null}
         />
         <PasswordField
@@ -117,7 +117,7 @@ export default function SignInPage() {
             setPassword(e.target.value)
             setError(null)
           }}
-          onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+          onBlur={() => password && setTouched((t) => ({ ...t, password: true }))}
           error={touched.password ? passwordIssue : null}
         />
         {error && (

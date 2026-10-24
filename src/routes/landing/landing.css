@@ -71,6 +71,8 @@
   border-radius: 38px; background: var(--color-paper);
 }
 .phone__screen::-webkit-scrollbar { display: none; }
+/* On touch a swipe over the phone must scroll the page, not the preview inside it. */
+@media (pointer: coarse), (max-width: 40rem) { .phone__screen { overflow-y: hidden; overscroll-behavior: auto; } }
 /* The page runs past the frame; fade the foot so the cut reads as a scroll. */
 .hero__phone::after { content: ""; position: absolute; inset: auto var(--space-xs) var(--space-xs); height: 16%; border-radius: 0 0 38px 38px; background: linear-gradient(transparent, var(--color-paper)); pointer-events: none; }
 .phone__screen:focus-visible { outline: 3px solid var(--color-accent-soft); outline-offset: 3px; }

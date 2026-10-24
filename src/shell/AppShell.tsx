@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Navigate, NavLink, Outlet } from 'react-router'
 import { useAuth } from '../lib/auth'
 import { MyPageProvider, useMyPage } from '../lib/page'
+import { SITE_HOST } from '../lib/types'
 import { pageAddress, pagePath } from '../lib/url'
 import { track } from '../analytics'
 import { Button, IconButton, Wordmark } from '../ui/controls'
@@ -202,7 +203,9 @@ function TopBar({ publish }: { publish: ReturnType<typeof usePublish> }) {
               panelClassName="menu__panel--address"
               button={
                 <>
-                  <span className="addr-chip__text">{pageAddress(handle)}</span>
+                  <span className="addr-chip__text">
+                    <span className="addr-chip__host">{SITE_HOST}</span>/{handle}
+                  </span>
                   <Icon name="chevronDown" size={16} />
                 </>
               }

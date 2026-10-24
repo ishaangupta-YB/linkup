@@ -142,3 +142,10 @@ test('an edit made just before a reload is kept', async ({ page }) => {
   await page.reload()
   await expect(page.getByRole('textbox', { name: 'Bio', exact: true })).toHaveValue('Typed a moment before reloading.')
 })
+
+test('tapping a button right after focusing an empty field still works', async ({ page }) => {
+  await page.goto('/signin')
+  await page.getByLabel('Email').focus()
+  await page.getByRole('button', { name: 'Use the demo account' }).click()
+  await expect(page).toHaveURL(/\/app\/editor$/)
+})

@@ -270,7 +270,7 @@
   padding: calc(var(--space-xs) + env(safe-area-inset-top)) max(var(--space-md), env(safe-area-inset-right)) var(--space-xs) max(var(--space-md), env(safe-area-inset-left));
   background: var(--color-surface);
 }
-.ed-sheet__title { flex: 1; min-width: 0; font-size: var(--text-lg); }
+.ed-sheet__title { flex: 1; min-width: 0; max-width: none; font-size: var(--text-lg); }
 .ed-sheet__close { flex: none; }
 .ed-sheet__note {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2xs) var(--space-sm);
@@ -292,3 +292,9 @@
   .ed-links.is-dragging .ed-link { transition: none; }
   .ed-dock, .editor__jump { transform: none !important; }
 }
+
+/* Toasts clear the Preview dock as well as the tab bar, and the dock steps aside while a link is dragged. */
+@media (max-width: 1099.98px) {
+  :root:has(.ed-dock) { --toast-offset: calc(var(--tabbar-h, 0px) + 52px + var(--space-sm)); }
+}
+.shell__main:has(.ed-links.is-dragging) .ed-dock { opacity: 0; pointer-events: none; }

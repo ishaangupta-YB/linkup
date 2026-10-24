@@ -93,7 +93,7 @@ export default function SignUpPage() {
           maxLength={LIMITS.name}
           value={values.name}
           onChange={(e) => set('name', e.target.value)}
-          onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+          onBlur={() => values.name.trim() && setTouched((t) => ({ ...t, name: true }))}
           error={shown('name')}
           hint="Shown at the top of your page. You can change it later."
         />
@@ -114,7 +114,7 @@ export default function SignUpPage() {
           placeholder="name@example.com"
           value={values.email}
           onChange={(e) => set('email', e.target.value)}
-          onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+          onBlur={() => values.email.trim() && setTouched((t) => ({ ...t, email: true }))}
           error={emailTaken ? 'An account with that email already exists.' : shown('email')}
         />
         {emailTaken && (
@@ -135,7 +135,7 @@ export default function SignUpPage() {
           aria-required="true"
           value={values.password}
           onChange={(e) => set('password', e.target.value)}
-          onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+          onBlur={() => values.password && setTouched((t) => ({ ...t, password: true }))}
           error={shown('password')}
           hint={`At least ${LIMITS.passwordMin} characters.`}
         />

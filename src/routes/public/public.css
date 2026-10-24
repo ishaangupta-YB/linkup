@@ -30,7 +30,7 @@
 .missing__bar { display: flex; align-items: center; height: 64px; padding: 0 var(--space-lg); }
 .missing__body { width: min(560px, 100% - 2 * var(--space-md)); margin: 0 auto; padding: var(--space-3xl) 0 var(--space-2xl); display: grid; gap: var(--space-md); align-content: start; }
 .missing__title { font-size: var(--text-3xl); max-width: none; overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
-.missing__addr { font-family: var(--font-outlier); font-weight: 500; letter-spacing: 0; overflow-wrap: anywhere; color: var(--color-accent-deep); }
+.missing__addr { display: block; font-size: 0.75em; font-family: var(--font-outlier); font-weight: 500; letter-spacing: 0; overflow-wrap: anywhere; color: var(--color-accent-deep); }
 .missing__text { color: var(--color-ink-2); max-width: 46ch; }
 .missing__text .mono { color: var(--color-ink); overflow-wrap: anywhere; }
 .missing__text a { color: var(--color-accent-deep); border-radius: 4px; }

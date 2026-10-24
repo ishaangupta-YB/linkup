@@ -96,3 +96,5 @@
   .auth__lead { margin-top: calc(-1 * var(--space-xs)); }
   .auth__demo { padding-top: var(--space-md); }
 }
+
+@media (pointer: coarse) { .auth__link { padding-block: 0.75em; } }

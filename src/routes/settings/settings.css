@@ -79,3 +79,5 @@
   .set-confirm .set-actions { gap: var(--space-sm); }
   .settings__sections > .set-section--danger { margin-top: var(--space-lg); }
 }
+
+@media (pointer: coarse) { .set-link { display: inline-flex; align-items: center; min-height: 44px; } }

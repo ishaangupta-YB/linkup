@@ -41,7 +41,7 @@
 
 .an-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-lg); min-width: 0; }
 .an-panel { display: grid; gap: var(--space-md); align-content: start; padding: var(--space-lg); min-width: 0; }
-.an-panel__head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--space-sm); }
+.an-panel__head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: var(--space-sm); }
 .an-panel__titles { display: grid; gap: var(--space-3xs); min-width: 0; }
 .an-panel__titles h2 { font-size: var(--text-lg); text-wrap: balance; }
 .an-panel__note { font-size: var(--text-sm); color: var(--color-muted); }
@@ -136,6 +136,13 @@
 .an-sharebar { display: grid; grid-template-columns: minmax(0, 1fr) 4ch; gap: var(--space-sm); align-items: center; }
 .an-sharebar .an-bars__track { grid-column: auto; }
 .an-sharebar__pct { text-align: right; color: var(--color-ink-2); }
+.an-bars__row:has(.an-social) { align-items: center; }
+/* Phones keep the percentage and drop the bar, so the table's last column stays in view. */
+@media (max-width: 40rem) {
+  .an-share-col { width: auto; min-width: 0; }
+  .an-sharebar { grid-template-columns: 4ch; }
+  .an-sharebar .an-bars__track { display: none; }
+}
 .an-log-time { white-space: nowrap; color: var(--color-ink-2); }
 .an-log-detail { overflow-wrap: anywhere; color: var(--color-ink-2); }
 

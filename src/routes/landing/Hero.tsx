@@ -42,7 +42,7 @@ export function Hero() {
               className="hero__phone"
               content={content}
               handle={DEMO_ACCOUNT.handle}
-              label={`The page at ${SITE_HOST}/${DEMO_ACCOUNT.handle}, scrollable`}
+              label={`The page at ${SITE_HOST}/${DEMO_ACCOUNT.handle}`}
             />
             <figcaption className="rx hero__label">
               <p className="rx__head mono">{SITE_HOST}/</p>

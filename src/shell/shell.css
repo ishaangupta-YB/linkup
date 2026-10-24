@@ -9,7 +9,7 @@
  *             (clear it with bottom: calc(var(--tabbar-h) + 12px + env(safe-area-inset-bottom)));
  * --shell-tabbar-h  the same with the safe area included. */
 .shell { --shell-bar-h: 60px; --topbar-h: calc(var(--shell-bar-h) + 1px + env(safe-area-inset-top)); --tabbar-h: 0px; --shell-tabbar-h: 0px; min-height: 100dvh; display: flex; flex-direction: column; }
-.skip-link { position: absolute; left: var(--space-sm); top: -100px; z-index: var(--z-toast); padding: var(--space-xs) var(--space-sm); border-radius: 8px; background: var(--color-ink); color: var(--color-paper); }
+.skip-link { position: absolute; display: inline-flex; align-items: center; min-height: 44px; left: var(--space-sm); top: -100px; z-index: var(--z-toast); padding: var(--space-xs) var(--space-sm); border-radius: 8px; background: var(--color-ink); color: var(--color-paper); }
 .skip-link:focus-visible { top: calc(var(--space-sm) + env(safe-area-inset-top)); }
 .shell__main { flex: 1; min-width: 0; outline: none; }
 .shell__error { max-width: 520px; margin: var(--space-2xl) auto; padding: var(--space-xl); display: grid; gap: var(--space-md); justify-items: start; }
@@ -181,3 +181,6 @@
   .topbar .wordmark { min-width: 44px; min-height: 44px; justify-content: center; }
   .topbar .wordmark > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
+
+/* Phones show only /handle in the chip; the full address is in its menu. */
+@media (max-width: 40rem) { .addr-chip__host { display: none; } }
