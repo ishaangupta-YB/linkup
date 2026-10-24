@@ -54,7 +54,14 @@ type Db = {
 type StoredPage = Page & { draftUpdatedAt: number }
 
 export const DB_VERSION = 2
-export const DB_KEY = 'linkup:db'
+/**
+ * Version 2 lives under its own key. A tab still running an older build reads and writes only
+ * LEGACY_DB_KEY, so it can never overwrite migrated data (an old build treats any version it
+ * does not know as empty and would save an empty database over it).
+ */
+export const DB_KEY = 'linkup:db:v2'
+/** Where version 1 lived. Read once to migrate, never written. */
+export const LEGACY_DB_KEY = 'linkup:db'
 export const SESSION_KEY = 'linkup:session'
 /** Where a database this build cannot read is kept, untouched, before starting a fresh one. */
 export const DB_BACKUP_KEY = 'linkup:db:backup'
@@ -131,7 +138,7 @@ export function migrateDb(raw: unknown): Db | null {
 
 function load(): Db {
   const raw = readRaw(DB_KEY)
-  if (raw == null) return emptyDb()
+  if (raw == null) return loadLegacy()
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
@@ -145,6 +152,25 @@ function load(): Db {
     return emptyDb()
   }
   if (isObject(parsed) && parsed.version !== DB_VERSION) writeJSON(DB_KEY, db)
+  return db
+}
+
+/** First run of this build: migrate version 1 into DB_KEY, leaving the old key as it was. */
+function loadLegacy(): Db {
+  const raw = readRaw(LEGACY_DB_KEY)
+  if (raw == null) return emptyDb()
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    parsed = undefined
+  }
+  const db = migrateDb(parsed)
+  if (!db) {
+    if (readRaw(DB_BACKUP_KEY) == null) writeJSON(DB_BACKUP_KEY, raw)
+    return emptyDb()
+  }
+  writeJSON(DB_KEY, db)
   return db
 }
 

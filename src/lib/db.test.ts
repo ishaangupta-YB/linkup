@@ -24,7 +24,7 @@ function v1Db() {
 
 describe('database versions', () => {
   it('migrates a version 1 database without losing anything', async () => {
-    localStorage.setItem(api.DB_KEY, JSON.stringify(v1Db()))
+    localStorage.setItem(api.LEGACY_DB_KEY, JSON.stringify(v1Db()))
     const pub = await api.getPublicPage('oldpage')
     expect(pub?.content.name).toBe('Old Name')
     expect(pub?.content.links[0]).toEqual({ id: 'l1', title: 'Old link', url: 'example.com', visible: true })
@@ -40,11 +40,21 @@ describe('database versions', () => {
   })
 
   it('keeps a signed-in version 1 user signed in with their draft', async () => {
-    localStorage.setItem(api.DB_KEY, JSON.stringify(v1Db()))
+    localStorage.setItem(api.LEGACY_DB_KEY, JSON.stringify(v1Db()))
     localStorage.setItem(api.SESSION_KEY, JSON.stringify('tok'))
     const page = await api.getMyPage()
     expect(page?.draft.bio).toBe('Old bio')
     expect(page?.draftUpdatedAt).toBe(7)
+  })
+
+  it('never writes the version 1 key, so a tab on an older build cannot wipe migrated data', async () => {
+    const legacy = JSON.stringify(v1Db())
+    localStorage.setItem(api.LEGACY_DB_KEY, legacy)
+    expect((await api.getPublicPage('oldpage'))?.content.name).toBe('Old Name')
+    expect(localStorage.getItem(api.LEGACY_DB_KEY)).toBe(legacy)
+    // The older build signs out and saves an empty version 1 database over its own key.
+    localStorage.setItem(api.LEGACY_DB_KEY, JSON.stringify({ version: 1, accounts: [], pages: [], sessions: {} }))
+    expect((await api.getPublicPage('oldpage'))?.content.name).toBe('Old Name')
   })
 
   it('migrateDb leaves a current database as it is and refuses what it cannot read', () => {

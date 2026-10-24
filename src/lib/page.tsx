@@ -196,7 +196,11 @@ export function MyPageProvider({ children }: { children: ReactNode }) {
         continue
       }
       const content = pending.current
-      if (!content) return true
+      if (!content) {
+        // A synchronous save (tab hidden) may have written it already; the label must not stay on Saving.
+        if (!conflictRef.current && !saveErrorRef.current) setSaveStatus('saved')
+        return true
+      }
       if (conflictRef.current) return false
       pending.current = null
       if (!(await saveOnce(content))) return false
@@ -237,6 +241,12 @@ export function MyPageProvider({ children }: { children: ReactNode }) {
         const saved = api.saveDraftSync(content, sent ? { basedOn: sent.at, pageId: sent.pageId } : undefined)
         base.current = baseOf(saved)
         pending.current = null
+        // Nothing else in flight: the stored draft is the newest one, so say so (and drop an old error).
+        if (!saving.current) {
+          saveErrorRef.current = null
+          setSaveError(null)
+          setSaveStatus('saved')
+        }
       } catch {
         // Signed out, edited elsewhere or out of space. Leaving the editor keeps the draft in memory
         // for when the same page loads again (after signing back in); otherwise it stays pending.

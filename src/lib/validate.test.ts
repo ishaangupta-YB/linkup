@@ -105,3 +105,31 @@ describe('contentProblem', () => {
     expect(contentProblem(content({ photo: large }))).toMatch(/too large/)
   })
 })
+
+describe('review round 2 regressions', () => {
+  it('keeps a Devanagari title that fitted as typed, even when NFC makes it longer', async () => {
+    const { normaliseText } = await import('./validate')
+    const typed = 'क'.repeat(35) + 'ख़ुशी' // precomposed ख़ then ुशी: 39 units, 40 limit
+    expect(typed.length).toBeLessThanOrEqual(40)
+    const out = normaliseText(typed, 40)
+    expect(out.endsWith('शी')).toBe(true)
+  })
+  it('clamps on a character boundary', async () => {
+    const { normaliseText } = await import('./validate')
+    expect(normaliseText('ab👩‍👩‍👧', 5)).toBe('ab')
+  })
+  it('refuses, never cuts, an over-long link address', async () => {
+    const { contentProblem, MAX_URL } = await import('./validate')
+    const { blankContent } = await import('./defaults')
+    const c = blankContent('A')
+    c.links[0].url = 'example.com/?q=' + 'x'.repeat(MAX_URL)
+    expect(contentProblem(c)).toMatch(/over 2,048 characters/)
+  })
+  it('reads a port as part of the address, not a scheme', async () => {
+    const { hasProtocol, isValidUrl } = await import('./url')
+    expect(hasProtocol('www.example.com:8080/path')).toBe(false)
+    expect(isValidUrl('www.example.com:8080/path')).toBe(true)
+    expect(hasProtocol('tel:9800000000')).toBe(true)
+    expect(hasProtocol('javascript:alert(1)')).toBe(true)
+  })
+})

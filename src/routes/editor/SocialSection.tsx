@@ -1,6 +1,7 @@
 import { SOCIALS, type SocialId } from '../../lib/types'
 import { socialHref } from '../../lib/url'
 import { TextField } from '../../ui/controls'
+import { MAX_SOCIAL } from '../../lib/validate'
 import type { SectionProps } from './types'
 
 /** The phone keyboard each field wants: @ handles get the key with @ on it, addresses the URL keys, WhatsApp the number pad. */
@@ -48,7 +49,13 @@ export function SocialSection({ draft, update }: SectionProps) {
               inputMode={INPUT_MODE[s.id]}
               enterKeyHint="next"
               hint={text}
-              error={text === null ? 'Add the full number with its country code, like 919800000000.' : null}
+              error={
+                value.trim().length > MAX_SOCIAL
+                  ? `That is over ${MAX_SOCIAL.toLocaleString('en')} characters, too long to save.`
+                  : text === null
+                    ? 'Add the full number with its country code, like 919800000000.'
+                    : null
+              }
               onChange={(e) => {
                 const next = e.target.value
                 update((d) => ({ ...d, socials: { ...d.socials, [s.id]: next } }))

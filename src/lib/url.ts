@@ -1,7 +1,8 @@
 import { SITE_HOST, type SocialId } from './types'
 
 export function hasProtocol(url: string) {
-  return /^[a-z][a-z0-9+.-]*:/i.test(url.trim())
+  // A colon followed by a digit is a port (example.com:8080), not a scheme; tel: is the exception.
+  return /^(tel:|[a-z][a-z0-9+.-]*:(?!\d))/i.test(url.trim())
 }
 
 /** The href a stored URL opens. Bare domains get https://. */

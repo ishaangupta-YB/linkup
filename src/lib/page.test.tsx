@@ -49,6 +49,19 @@ describe('MyPageProvider', () => {
     act(() => root.unmount())
   })
 
+  it('shows Saved after a hidden tab wrote the draft synchronously', async () => {
+    const root = await mount()
+    act(() => ctx!.updateDraft((d) => ({ ...d, tagline: 'Hidden mid-edit' })))
+    expect(ctx!.saveStatus).toBe('saving')
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' })
+    act(() => { document.dispatchEvent(new Event('visibilitychange')) })
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' })
+    expect((await api.getMyPage())?.draft.tagline).toBe('Hidden mid-edit')
+    await act(async () => { await new Promise((r) => setTimeout(r, 700)) })
+    expect(ctx!.saveStatus).toBe('saved')
+    act(() => root.unmount())
+  })
+
   it('publishes the latest edit after saving it', async () => {
     const root = await mount()
     act(() => ctx!.updateDraft((d) => ({ ...d, name: 'Asha Rao' })))

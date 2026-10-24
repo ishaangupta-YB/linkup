@@ -10,8 +10,8 @@ import { hasProtocol, isSafeHref } from './url'
 
 /** Longest stored link or social address. Browsers handle far longer, people never need it. */
 export const MAX_URL = 2048
-/** Longest stored social value (a handle or a profile address). */
-export const MAX_SOCIAL = 200
+/** Longest stored social value (a handle or a profile address, tracking parameters and all). */
+export const MAX_SOCIAL = MAX_URL
 
 const GROUNDS: Ground[] = ['paper', 'green', 'night']
 const TINTS: Tint[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
@@ -22,9 +22,19 @@ const BUTTON_SHAPES: ButtonShape[] = ['soft', 'pill', 'square']
 // eslint-disable-next-line no-control-regex
 const CONTROL = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F‪-‮⁦-⁩]/g
 
-/** Cuts to `max` UTF-16 units without splitting a surrogate pair. */
+const graphemes = typeof Intl !== 'undefined' && 'Segmenter' in Intl ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null
+
+/** Cuts to at most `max` UTF-16 units on a character boundary (never mid-emoji or mid-syllable). */
 function clamp(text: string, max: number) {
   if (text.length <= max) return text
+  if (graphemes) {
+    let end = 0
+    for (const { segment } of graphemes.segment(text)) {
+      if (end + segment.length > max) break
+      end += segment.length
+    }
+    return text.slice(0, end)
+  }
   const cut = text.slice(0, max)
   const last = cut.charCodeAt(cut.length - 1)
   return last >= 0xd800 && last <= 0xdbff ? cut.slice(0, -1) : cut
@@ -36,8 +46,15 @@ function clamp(text: string, max: number) {
  * line breaks but at most one blank line in a row.
  */
 export function normaliseText(value: unknown, max: number, { multiline = false } = {}): string {
-  let text = typeof value === 'string' ? value : value == null ? '' : String(value)
-  text = text.normalize('NFC').replace(/\r\n?/g, '\n').replace(/\t/g, ' ').replace(CONTROL, '')
+  const raw = typeof value === 'string' ? value : value == null ? '' : String(value)
+  const typed = tidy(raw, multiline)
+  const text = tidy(raw.normalize('NFC'), multiline)
+  // NFC can lengthen some scripts (Devanagari nukta letters); a value that fitted as typed still fits.
+  return typed.length <= max ? text : clamp(text, max).trim()
+}
+
+function tidy(value: string, multiline: boolean): string {
+  let text = value.replace(/\r\n?/g, '\n').replace(/\t/g, ' ').replace(CONTROL, '')
   text = multiline
     ? text
         .split('\n')
@@ -45,7 +62,7 @@ export function normaliseText(value: unknown, max: number, { multiline = false }
         .join('\n')
         .replace(/\n{3,}/g, '\n\n')
     : text.replace(/\s+/g, ' ')
-  return clamp(text.trim(), max).trim()
+  return text.trim()
 }
 
 function oneOf<T extends string>(value: unknown, allowed: T[], fallback: T): T {
@@ -139,6 +156,8 @@ export function contentProblem(content: PageContent): string | null {
   if (links.length > LIMITS.links) return `A page holds ${LIMITS.links} links at most.`
   for (const [i, link] of links.entries()) {
     const url = typeof link?.url === 'string' ? link.url : ''
+    // Too long is refused, never cut: a cut address would publish a broken link.
+    if (url.trim().length > MAX_URL) return `Link ${i + 1} has an address over ${MAX_URL.toLocaleString('en')} characters. Use a shorter one.`
     if (isUnsafeUrl(url)) {
       const title = typeof link?.title === 'string' && link.title.trim() ? `“${link.title.trim()}”` : `number ${i + 1}`
       return `Link ${title} has an address that cannot open on a page. Start it with https://, mailto: or tel:.`
@@ -147,6 +166,7 @@ export function contentProblem(content: PageContent): string | null {
   const socials = (content.socials ?? {}) as Partial<Record<SocialId, unknown>>
   for (const s of SOCIALS) {
     const value = socials[s.id]
+    if (typeof value === 'string' && value.trim().length > MAX_SOCIAL) return `The ${s.label} address is over ${MAX_SOCIAL.toLocaleString('en')} characters. Use a shorter one.`
     if (typeof value === 'string' && isUnsafeUrl(value)) return `The ${s.label} address cannot open on a page. Use a handle or an https:// address.`
   }
   return photoValueProblem(typeof content.photo === 'string' ? content.photo : null)

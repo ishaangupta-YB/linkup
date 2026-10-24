@@ -3,6 +3,7 @@ import { track } from '../../analytics'
 import { newId } from '../../lib/ids'
 import { LIMITS, type LinkItem } from '../../lib/types'
 import { isValidUrl } from '../../lib/url'
+import { MAX_URL } from '../../lib/validate'
 import { Button, IconButton, TextField, Toggle } from '../../ui/controls'
 import { Icon } from '../../ui/Icon'
 import { useToast } from '../../ui/Toast'
@@ -23,6 +24,7 @@ const nameOf = (link: LinkItem) => link.title.trim() || 'Untitled link'
 
 function urlProblem(url: string) {
   if (!url.trim()) return 'Add an address so this link opens.'
+  if (url.trim().length > MAX_URL) return `That address is over ${MAX_URL.toLocaleString('en')} characters, too long to save. Use a shorter link.`
   if (!isValidUrl(url)) return 'That address looks incomplete. Write it like example.com/page.'
   return null
 }
@@ -139,6 +141,10 @@ export function LinksSection({ draft, update, meta }: SectionProps) {
     if (!dragRef.current) return
     const step = edgeStep(pointerY.current)
     if (!step) return
+    // Stop once the row has reached the end of the list; scrolling further would carry it off screen.
+    const d = dragRef.current
+    const reach = pointerY.current + window.scrollY - d.startY
+    if ((step > 0 && reach >= d.maxDy) || (step < 0 && reach <= d.minDy)) return
     const before = window.scrollY
     window.scrollBy(0, step)
     if (window.scrollY === before) return

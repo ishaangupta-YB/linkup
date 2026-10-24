@@ -46,6 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     current.current = next
     setState(next)
     identify(account?.id ?? null)
+    // A deliberate sign-out blocks keeping drafts only until someone is signed in again, in any tab.
+    if (account) allowRescuedDrafts()
   }, [])
 
   const setAccount = useCallback((account: Account | null) => apply(account), [apply])
