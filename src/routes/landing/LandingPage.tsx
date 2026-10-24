@@ -10,7 +10,7 @@ import { MapSection } from './MapSection'
 import './landing.css'
 
 export default function LandingPage() {
-  useTitle('LinkUp, one address for every link you share')
+  useTitle('LinkUp, see which link they tapped')
   return (
     <div className="landing grain">
       <a className="skip" href="#main">

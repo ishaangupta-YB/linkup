@@ -10,7 +10,7 @@ const GROUNDS: SegmentOption<Ground>[] = [
   { value: 'night', label: 'Night' },
 ]
 
-const TINT_NAMES: Record<Tint, string> = { mon: 'Rose', tue: 'Apricot', wed: 'Lemon', thu: 'Mint', fri: 'Sky', sat: 'Lavender', sun: 'Orchid' }
+const TINT_NAMES: Record<Tint, string> = { mon: 'Rose', tue: 'Apricot', wed: 'Butter', thu: 'Mint', fri: 'Sky', sat: 'Lilac', sun: 'Orchid' }
 const TINTS: SegmentOption<Tint>[] = (Object.keys(TINT_NAMES) as Tint[]).map((t) => ({
   value: t,
   title: TINT_NAMES[t],
@@ -25,7 +25,7 @@ const TINTS: SegmentOption<Tint>[] = (Object.keys(TINT_NAMES) as Tint[]).map((t)
 const STYLES: SegmentOption<ButtonStyle>[] = [
   { value: 'moulded', label: 'Moulded' },
   { value: 'clear', label: 'Clear' },
-  { value: 'label', label: 'Pharmacy label' },
+  { value: 'label', label: 'Label' },
 ]
 
 const SHAPES: SegmentOption<ButtonShape>[] = [
@@ -49,7 +49,7 @@ export function LookTray() {
       <div className="container looks__grid">
         <div className="looks__side">
           <div className="looks__head">
-            <h2 id="looks-title">Pick the plastic.</h2>
+            <h2 id="looks-title">Three grounds, seven tints, nine buttons.</h2>
             <p className="lead">Every page is made of the same parts. Try them on the demo page.</p>
           </div>
           <div className="looks__tray plastic">

@@ -13,7 +13,7 @@ export function AskRows() {
     <section className="asks" aria-labelledby="asks-title">
       <div className="container asks__grid">
         <h2 id="asks-title" className="asks__title">
-          What people ask first.
+          Up to eight links, and an undo.
         </h2>
         <dl className="asks__rows">
           {ASKS.map((r) => (

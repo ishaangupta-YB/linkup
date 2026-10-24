@@ -25,7 +25,7 @@ async function expectNoHorizontalScroll(page: Page) {
 test('landing page leads to sign up', async ({ page }) => {
   const errors = watchErrors(page)
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1, name: 'One address for every link you share.' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'See which link they tapped.' })).toBeVisible()
   await expectNoHorizontalScroll(page)
   await page.getByRole('link', { name: 'Make your page' }).first().click()
   await expect(page).toHaveURL(/\/signup$/)

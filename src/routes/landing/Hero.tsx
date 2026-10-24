@@ -17,7 +17,7 @@ export function Hero() {
       </div>
       <div className="container hero__grid">
         <div className="hero__text">
-          <h1 id="hero-title">One address for every link you share.</h1>
+          <h1 id="hero-title">See which link they tapped.</h1>
           <p className="lead hero__line">
             Put <span className="mono">{SITE_HOST}/your-name</span> in your bio and see what people tap.
           </p>
@@ -48,7 +48,7 @@ export function Hero() {
               <p className="rx__head mono">{SITE_HOST}/</p>
               <p className="rx__name mono">{DEMO_ACCOUNT.handle}</p>
               <p className="rx__meta mono">
-                {shown} of {LIMITS.links} links shown
+                {shown} links, room for {LIMITS.links}
               </p>
               <p className="rx__stamp mono">Published</p>
             </figcaption>

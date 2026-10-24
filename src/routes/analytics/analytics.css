@@ -174,7 +174,7 @@
   .an-controls { width: 100%; }
   .an-controls .segmented { width: 100%; }
   .an-controls .segmented__option { flex: 1; }
-  .an-controls .segmented__option span { width: 100%; justify-content: center; }
+  .an-controls .segmented__option > span { width: 100%; justify-content: center; }
   .an-panel { padding: var(--space-md); }
   .an-table-wrap { margin-inline: calc(var(--space-md) * -1); padding-inline: var(--space-md); }
   .an-stat { padding-inline: var(--space-md); }

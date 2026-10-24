@@ -3,8 +3,8 @@
  * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · fold: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, a link-in-bio page could look like any; the hero shows the real demo page and the map traces a visit from a bio to a counted tap */
 /* Hallmark · waive 47b · one phone frame per screen, the real ProfileView inside · the public page is a phone page, so the frame is the size it lives at */
-/* Hallmark · hero-review: in-thread (no subagent tool in this harness) · fix · 3 findings · 2 resolved 1 partial (headline fits the category, not only LinkUp) */
-/* Hallmark · finish-review: in-thread · fix · 3 findings · 2 resolved 1 unresolved (looks tray leaves air right of the keys at 1440) · gap: none */
+/* Hallmark · hero-review: subagent, fresh context · fix · 5 findings · 4 resolved (headline now LinkUp's own, label states 4 links of room for 8, phone foot fades to paper, label off the bio on phones) · 1 declined: tint names in the cells, cut off behind the phone */
+/* Hallmark · finish-review: subagent, fresh context · fix · 8 findings · 7 resolved (statement on the ink band, tray fills the phone height, child-only segmented selectors, product look names, heads from the facts) · 1 declined: text-wrap balance stays, sloplint F3 asks for it */
 
 /* Tokens and base are global (src/styles); this file is the landing page only. */
 
@@ -66,6 +66,8 @@
   border-radius: 38px; background: var(--color-paper);
 }
 .phone__screen::-webkit-scrollbar { display: none; }
+/* The page runs past the frame; fade the foot so the cut reads as a scroll. */
+.hero__phone::after { content: ""; position: absolute; inset: auto var(--space-xs) var(--space-xs); height: 16%; border-radius: 0 0 38px 38px; background: linear-gradient(transparent, var(--color-paper)); pointer-events: none; }
 .phone__screen:focus-visible { outline: 3px solid var(--color-accent-soft); outline-offset: 3px; }
 
 /* ---------- a pharmacy label: paper on plastic ---------- */
@@ -139,13 +141,13 @@
 /* ---------- the look tray, with the page answering live ---------- */
 
 .looks { padding-block: var(--section-gap-l) var(--section-gap); }
-.looks__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-2xl) var(--gap-columns); align-items: center; }
-.looks__side { grid-column: 1 / 8; display: grid; gap: var(--space-2xl); }
+.looks__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-2xl) var(--gap-columns); align-items: start; }
+.looks__side { grid-column: 1 / 8; display: grid; grid-template-rows: auto 1fr; gap: var(--space-2xl); align-self: stretch; }
 .looks__head { display: grid; gap: var(--space-md); }
 .looks__head .lead { color: var(--color-ink-2); }
 .looks__tray {
   --t: var(--p-wed);
-  display: grid; gap: var(--space-lg); padding: var(--space-xl);
+  display: grid; gap: var(--space-lg); align-content: space-evenly; padding: var(--space-xl);
   box-shadow: inset 0 2px 8px var(--shade-25), inset 0 1.5px 0 var(--glint), inset 0 -24px 36px -28px color-mix(in oklab, var(--t) 45%, var(--color-ink));
 }
 .looks__row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: center; gap: var(--space-md); }
@@ -153,7 +155,8 @@
 .looks__label { font-size: var(--text-sm); font-weight: 500; color: var(--color-ink); }
 .looks__value { display: block; font-weight: 400; color: var(--color-ink-2); }
 .swatch { display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--t); box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--shade-25); }
-.looks__tints .segmented__option span { padding-inline: var(--space-xs); }
+.looks__tints .segmented__option > span { padding-inline: var(--space-xs); }
+.looks__tints .segmented__option input:checked + span { background: transparent; box-shadow: 0 0 0 2px var(--color-accent); }
 .looks__stage { grid-column: 9 / 13; display: grid; justify-items: center; height: 660px; }
 .looks__phone { height: 100%; }
 
@@ -168,13 +171,13 @@
 
 /* ---------- the statement ---------- */
 
-.quiet { padding-block: var(--section-gap-l); }
+.quiet { padding-block: var(--section-gap-s); background: var(--color-ink); color: var(--color-paper); }
 .quiet__line { max-width: 19ch; font-size: var(--text-display); line-height: 1.02; }
-.quiet__sub { margin-top: var(--space-lg); color: var(--color-ink-2); }
+.quiet__sub { margin-top: var(--space-lg); color: var(--color-accent-soft); }
 
 /* ---------- the close: the address as labels ---------- */
 
-.close { padding-block: var(--section-gap) var(--section-gap-l); }
+.close { padding-block: var(--section-gap-s) var(--section-gap-l); }
 .close__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-2xl) var(--gap-columns); align-items: center; }
 .close__text { grid-column: 1 / 6; display: grid; gap: var(--space-lg); justify-items: start; }
 .close__text .lead { color: var(--color-ink-2); }
@@ -244,7 +247,7 @@
   .close__label:nth-child(n) { transform: none; }
   .rx { width: 176px; padding: var(--space-sm) var(--space-sm) var(--space-lg); }
   .rx__name { font-size: var(--text-sm); }
-  .hero__label { left: calc(-1 * var(--space-lg)); bottom: 6%; transform: rotate(-3deg); }
+  .hero__label { display: none; }
 }
 @media (max-width: 24rem) {
   .lnav__link { display: none; }
