@@ -1,0 +1,86 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
+ * nav: wordmark only, no tabs before sign-in · signature: the page address as a pharmacy label on a plastic band, stamped free or not free as you type · states: loading, error, busy, full · dose: white
+ * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, the form stays plain white so the one label on the band carries the material */
+
+.auth { min-height: 100dvh; display: grid; grid-template-rows: auto 1fr; }
+.auth__bar { display: flex; align-items: center; height: 64px; padding: 0 var(--space-lg); }
+
+.auth__body {
+  width: min(1080px, 100% - 2 * var(--space-md)); margin: 0 auto; padding: var(--space-lg) 0 var(--space-2xl);
+  display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: var(--space-xl); align-items: stretch; align-content: start;
+}
+
+.auth__panel { display: grid; gap: var(--space-lg); align-content: start; padding: var(--space-xl); }
+.auth__title { font-size: var(--text-3xl); line-height: 1.05; }
+.auth__lead { color: var(--color-ink-2); margin-top: calc(-1 * var(--space-sm)); }
+
+.auth__form { display: grid; gap: var(--space-md); }
+.auth__submit { width: 100%; }
+.auth__form .auth__submit { margin-top: var(--space-xs); }
+.auth__inline { margin-top: calc(-1 * var(--space-xs)); font-size: var(--text-sm); color: var(--color-ink-2); }
+.auth__alert {
+  padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-input);
+  background: color-mix(in oklab, var(--color-error) 8%, var(--glint)); color: var(--color-error);
+  font-size: var(--text-sm); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-error) 30%, transparent);
+}
+.auth__form[role="alert"] { justify-items: start; }
+
+.auth__link {
+  color: var(--color-accent-deep); font-weight: 500; text-decoration: underline; text-decoration-color: color-mix(in oklab, var(--color-accent) 45%, transparent);
+  border-radius: 4px; transition: color var(--dur-micro) var(--ease-out), text-decoration-color var(--dur-micro) var(--ease-out);
+}
+.auth__link:hover { color: var(--color-ink); text-decoration-color: var(--color-accent); }
+.auth__link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.auth__link:active { color: var(--color-accent); }
+.auth__link--btn { padding: 0; border: 0; background: none; font-size: inherit; cursor: pointer; }
+.auth__link--btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.auth__link--btn.mono { font-family: var(--font-outlier); font-weight: 400; }
+
+.auth__demo { display: grid; gap: var(--space-xs); padding-top: var(--space-lg); border-top: 1px solid var(--color-rule); }
+.auth__demo-note { font-size: var(--text-sm); color: var(--color-muted); }
+.auth__demo-note .mono { color: var(--color-ink-2); }
+.auth__switch { font-size: var(--text-sm); color: var(--color-ink-2); }
+
+/* ---------- the band and its label ---------- */
+
+.auth__band { --t: var(--p-thu); display: grid; place-items: center; min-height: 520px; padding: var(--space-2xl) var(--space-xl); overflow: hidden; }
+
+.addr-label {
+  position: relative; width: min(380px, 100%); padding: var(--space-lg) var(--space-lg) var(--space-md);
+  border-radius: var(--radius-input); background-color: var(--glint); box-shadow: var(--shadow-lift);
+  transform: rotate(-1.5deg);
+}
+.addr-label__head { font-size: var(--text-sm); color: var(--color-muted); }
+.addr-label__addr { margin-top: var(--space-xs); font-size: var(--text-xl); line-height: 1.25; color: var(--color-ink); overflow-wrap: anywhere; }
+.addr-label__handle { color: var(--color-accent-deep); }
+.addr-label__handle--empty { color: var(--color-muted); }
+.addr-label__note { margin-top: var(--space-sm); font-size: var(--text-sm); color: var(--color-ink-2); }
+.addr-label__stub { height: 28px; margin: var(--space-md) calc(-1 * var(--space-lg)) 0; border-top: 1.5px dashed var(--color-rule); }
+
+.addr-stamp {
+  position: absolute; right: var(--space-md); bottom: var(--space-sm);
+  padding: var(--space-2xs) var(--space-xs); border: 2px solid currentColor; border-radius: 8px;
+  box-shadow: 0 0 0 2px var(--glint), 0 0 0 3.5px currentColor;
+  font-family: var(--font-outlier); font-size: var(--text-sm); font-weight: 500;
+  transform: rotate(2deg); animation: stamp-land var(--dur-short) var(--ease-out);
+}
+.addr-stamp--given { color: var(--color-accent); }
+.addr-stamp--grey { color: var(--color-muted); }
+@keyframes stamp-land { from { opacity: 0; transform: rotate(2deg) scale(1.2); } }
+@media (prefers-reduced-motion: reduce) { .addr-stamp { animation: none; } }
+
+.sk-label { height: 14px; width: 35%; }
+.sk-input { height: 40px; }
+
+@media (max-width: 60rem) {
+  .auth__bar { height: 56px; padding: 0 var(--space-md); }
+  .auth__body { grid-template-columns: minmax(0, 1fr); gap: var(--space-md); padding-top: 0; max-width: 520px; }
+  .auth__band { order: -1; min-height: 0; padding: var(--space-lg) var(--space-md); }
+  .auth__panel { padding: var(--space-lg); }
+  .auth__title { font-size: var(--text-2xl); }
+  .addr-label { padding: var(--space-md); }
+  .addr-label__addr { font-size: var(--text-lg); }
+  .addr-label__stub { display: none; }
+  .input { font-size: var(--text-md); }
+}

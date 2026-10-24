@@ -1,0 +1,69 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
+ * nav: the shell's top bar, Settings tab current · signature: the page address and publish time in DM Mono, read like a label · states: loading, error, busy, success, full · dose: white
+ * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S3 R4 V4 · weakest: S, settings stay plain white surfaces on purpose; the material is in the controls */
+
+.settings { width: min(760px, 100% - 2 * var(--space-md)); margin: 0 auto; padding: var(--space-xl) 0 var(--space-2xl); }
+.settings__head { margin-bottom: var(--space-lg); }
+.settings__head h1 { font-size: var(--text-3xl); text-wrap: balance; }
+.settings__sections { display: grid; gap: var(--space-lg); }
+
+.set-section { display: grid; gap: var(--space-md); padding: var(--space-lg); }
+.set-section__head { display: grid; gap: var(--space-2xs); }
+.set-section__head h2 { font-size: var(--text-xl); line-height: 1.2; text-wrap: balance; }
+.set-section__intro { color: var(--color-ink-2); font-size: var(--text-sm); max-width: 60ch; }
+.set-section__body { display: grid; gap: var(--space-md); }
+.set-section--danger { box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-error) 30%, var(--color-rule)), var(--shadow-card); }
+
+.set-form { display: grid; gap: var(--space-md); }
+.set-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); align-items: start; }
+.set-narrow { max-width: 420px; }
+.set-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); }
+
+.set-result { display: inline-flex; align-items: center; gap: var(--space-2xs); min-height: 1lh; font-size: var(--text-sm); color: var(--color-muted); }
+.set-result:empty { display: none; }
+.set-result--ok { color: var(--color-accent-deep); }
+.set-result--error { color: var(--color-error); }
+.set-result svg { flex: none; }
+
+.set-warn {
+  display: flex; align-items: flex-start; gap: var(--space-xs); max-width: 60ch;
+  padding: var(--space-sm); border-radius: var(--radius-input); background: var(--color-paper-2);
+  font-size: var(--text-sm); color: var(--color-ink-2);
+}
+.set-warn svg { flex: none; margin-top: 2px; color: var(--color-muted); }
+
+.set-muted { font-size: var(--text-sm); color: var(--color-muted); }
+
+.set-facts { display: grid; gap: var(--space-xs); margin: 0; }
+.set-facts > div { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: var(--space-sm); align-items: baseline; }
+.set-facts dt { font-size: var(--text-sm); font-weight: 500; color: var(--color-ink-2); }
+.set-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+
+.set-link { color: var(--color-accent-deep); text-decoration: underline; text-decoration-color: color-mix(in oklab, var(--color-accent) 45%, transparent); border-radius: 4px; transition: color var(--dur-micro) var(--ease-out); }
+.set-link:hover { color: var(--color-ink); text-decoration-color: var(--color-accent); }
+.set-link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.set-link:active { color: var(--color-accent); }
+
+.set-confirm { display: grid; gap: var(--space-sm); padding: var(--space-md); border-radius: var(--radius-input); background: var(--color-paper-2); }
+.set-confirm p { font-size: var(--text-sm); color: var(--color-ink-2); max-width: 60ch; }
+
+.set-toggles { display: grid; margin: 0; padding: 0; list-style: none; }
+.set-toggles li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding: var(--space-sm) 0; border-top: 1px solid var(--color-rule); }
+.set-toggles li:last-child { border-bottom: 1px solid var(--color-rule); }
+.set-toggles__name { font-weight: 500; }
+.set-toggles li:has(input:disabled) .set-toggles__name { color: var(--color-muted); }
+.set-toggles li:has(input:disabled) { cursor: progress; }
+.set-confirm .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.sk-head { height: 20px; width: 30%; }
+.sk-line { height: 12px; width: 60%; }
+.sk-input { height: 40px; }
+
+@media (max-width: 40rem) {
+  .settings { padding-top: var(--space-lg); }
+  .settings__head h1 { font-size: var(--text-2xl); }
+  .set-section { padding: var(--space-md); }
+  .set-grid { grid-template-columns: minmax(0, 1fr); }
+  .set-facts > div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}

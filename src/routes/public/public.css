@@ -1,0 +1,40 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
+ * nav: wordmark only on the missing screens, none on a live page · signature: the missing address set in DM Mono like a label that was never printed · states: loading, missing, error, full · dose: white
+ * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S3 R4 V4 · weakest: S, the missing screens stay quiet on purpose; the live page is ProfileView's */
+/* Hallmark · waive 26b · the only controls here are ui.css .btn links and buttons, which carry :disabled · the missing and error screens own no form control of their own */
+
+.public { min-height: 100dvh; display: flex; flex-direction: column; }
+.public > * { flex: 1; }
+
+/* ---------- loading: the page's own shape ---------- */
+
+.public-sk { min-height: 100dvh; display: flex; justify-content: center; padding: var(--space-3xl) var(--space-md) var(--space-2xl); }
+.public-sk__col { width: min(480px, 100%); display: grid; justify-items: center; align-content: start; gap: var(--space-sm); }
+.public-sk__photo { width: 96px; height: 96px; border-radius: 50%; margin-bottom: var(--space-xs); }
+.public-sk__name { width: 55%; height: 28px; }
+.public-sk__line { width: 75%; height: 14px; }
+.public-sk__line--short { width: 45%; }
+.public-sk__links { width: 100%; display: grid; gap: var(--space-sm); margin-top: var(--space-lg); }
+.public-sk__link { height: 56px; border-radius: var(--radius-card); }
+
+/* ---------- missing and error ---------- */
+
+.missing { min-height: 100dvh; display: grid; grid-template-rows: auto 1fr; }
+.missing__bar { display: flex; align-items: center; height: 64px; padding: 0 var(--space-lg); }
+.missing__body { width: min(560px, 100% - 2 * var(--space-md)); margin: 0 auto; padding: var(--space-3xl) 0 var(--space-2xl); display: grid; gap: var(--space-md); align-content: start; }
+.missing__title { font-size: var(--text-3xl); max-width: none; }
+.missing__addr { font-family: var(--font-outlier); font-weight: 500; letter-spacing: 0; overflow-wrap: anywhere; color: var(--color-accent-deep); }
+.missing__text { color: var(--color-ink-2); max-width: 46ch; }
+.missing__text .mono { color: var(--color-ink); overflow-wrap: anywhere; }
+.missing__text a { color: var(--color-accent-deep); border-radius: 4px; }
+.missing__text a:hover { color: var(--color-ink); }
+.missing__text a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.missing__text a:active { color: var(--color-accent); }
+.missing__actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-xs); }
+
+@media (max-width: 40rem) {
+  .missing__bar { height: 56px; padding: 0 var(--space-md); }
+  .missing__body { padding-top: var(--space-2xl); }
+  .missing__title { font-size: var(--text-2xl); }
+}
