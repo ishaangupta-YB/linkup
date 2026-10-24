@@ -5,6 +5,7 @@ import { useAuth } from '../../lib/auth'
 import { DEMO_ACCOUNT } from '../../lib/defaults'
 import { Button, TextField } from '../../ui/controls'
 import { AddressLabel, AuthLayout } from './AuthLayout'
+import { nextOnEnter, useKeepSubmitInView } from './formKeys'
 import { PasswordField } from './PasswordField'
 
 type LocationState = { from?: string; email?: string } | null
@@ -28,6 +29,8 @@ export default function SignInPage() {
   const [submitted, setSubmitted] = useState(false)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  useKeepSubmitInView(formRef)
 
   if (auth.status === 'signedIn' && !submitted) return <Navigate to={target} replace />
 
@@ -71,16 +74,20 @@ export default function SignInPage() {
       lead="Edit your page, publish it and see what people tap."
       band={<AddressLabel handle="" note="Your address stays the same every time you publish." />}
     >
-      <form className="auth__form" onSubmit={onSubmit} noValidate>
+      <form ref={formRef} className="auth__form" onSubmit={onSubmit} noValidate>
         <TextField
           ref={emailRef}
           label="Email"
           name="email"
           type="email"
           inputMode="email"
-          autoComplete="email"
+          // The email is this account's username, so a password manager fills it with the password.
+          autoComplete="username"
           autoCapitalize="off"
+          autoCorrect="off"
           spellCheck={false}
+          enterKeyHint="next"
+          onKeyDown={nextOnEnter}
           required
           aria-required="true"
           value={email}
@@ -96,6 +103,7 @@ export default function SignInPage() {
           label="Password"
           name="password"
           autoComplete="current-password"
+          enterKeyHint="go"
           required
           aria-required="true"
           value={password}

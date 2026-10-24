@@ -1,9 +1,12 @@
 /* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
- * nav: wordmark only, no tabs before sign-in · signature: the page address as a pharmacy label on a plastic band, stamped free or not free as you type · states: loading, error, busy, full · dose: white
+ * nav: wordmark only, no tabs before sign-in · signature: the page address as a pharmacy label on a plastic band, stamped free or not free as you type; on a phone the form comes first and the band follows it · states: loading, error, busy, full · dose: white
  * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, the form stays plain white so the one label on the band carries the material */
 
-.auth { min-height: 100dvh; display: grid; grid-template-rows: auto 1fr; }
+.auth {
+  min-height: 100dvh; display: grid; grid-template-rows: auto 1fr;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
 .auth__bar { display: flex; align-items: center; height: 64px; padding: 0 var(--space-lg); }
 
 .auth__body {
@@ -76,11 +79,18 @@
 @media (max-width: 60rem) {
   .auth__bar { height: 56px; padding: 0 var(--space-md); }
   .auth__body { grid-template-columns: minmax(0, 1fr); gap: var(--space-md); padding-top: 0; max-width: 520px; }
-  .auth__band { order: -1; min-height: 0; padding: var(--space-lg) var(--space-md); }
-  .auth__panel { padding: var(--space-lg); }
+  /* The form first, so the fields and the button are what a thumb meets; the label follows as a quiet preview. */
+  .auth__band { min-height: 0; padding: var(--space-lg) var(--space-md); }
+  .auth__panel { padding: var(--space-lg); gap: var(--space-md); }
   .auth__title { font-size: var(--text-2xl); }
   .addr-label { padding: var(--space-md); }
   .addr-label__addr { font-size: var(--text-lg); }
   .addr-label__stub { display: none; }
-  .input { font-size: var(--text-md); }
+  .input { font-size: max(16px, var(--text-md)); }
+}
+@media (max-width: 40rem) {
+  .auth__body { width: calc(100% - 2 * var(--space-sm)); }
+  .auth__panel { padding: var(--space-lg) var(--space-md); }
+  .auth__lead { margin-top: calc(-1 * var(--space-xs)); }
+  .auth__demo { padding-top: var(--space-md); }
 }

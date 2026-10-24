@@ -1,7 +1,7 @@
 /* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
- * nav: the shell's top bar; filters in one row above everything they scope · signature: the daily traffic chart, views in pharmacy green over link clicks in muted ink, crosshair and arrow keys · states: loading, empty, error, full · dose: white · data: real events plus labelled sample
+ * nav: the shell's top bar; filters in one row above everything they scope, range keys full width on a phone · signature: the daily traffic chart, views in pharmacy green over link clicks in muted ink, crosshair by arrow keys, hover or a thumb drag, read above the plot on a phone · states: loading, empty, error, full · dose: white · data: real events plus labelled sample
  * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: E, one plastic tray carries the stats so the charts stay on plain white */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: E, one plastic tray carries the stats so the charts stay on plain white; tables pin their first column and recent activity turns into a list on a phone */
 
 .an {
   width: 100%; max-width: 1200px; margin-inline: auto;
@@ -24,6 +24,7 @@
   color: var(--color-ink-2); font-size: var(--text-sm); max-width: none;
 }
 .an-banner svg { flex: none; margin-top: 1px; color: var(--color-muted); }
+.an-banner strong { font-weight: 500; color: var(--color-ink); }
 
 /* ---------- stat row on one plastic tray ---------- */
 
@@ -58,6 +59,7 @@
 .an-chart { position: relative; min-width: 0; }
 .an-chart__focus { position: relative; border-radius: 8px; outline: 2px solid transparent; outline-offset: 4px; }
 .an-chart__focus:focus-visible { outline-color: var(--color-focus); }
+.an-chart__focus[data-touch]:focus-visible { outline-color: transparent; }
 .an-svg { overflow: visible; touch-action: pan-y; }
 .an-gridline { stroke: var(--color-rule); stroke-width: 1; shape-rendering: crispEdges; }
 .an-axis { fill: var(--color-muted); font-family: var(--font-body); font-size: 12px; font-variant-numeric: tabular-nums; }
@@ -66,6 +68,7 @@
 .an-line--views { stroke: var(--chart-1); }
 .an-line--clicks { stroke: var(--chart-2); }
 .an-crosshair { stroke: var(--color-ink-2); stroke-width: 1; shape-rendering: crispEdges; }
+@media (pointer: coarse) { .an-crosshair { stroke-width: 2; } }
 .an-dot { stroke: var(--glint); stroke-width: 2; }
 .an-dot--views { fill: var(--chart-1); }
 .an-dot--clicks { fill: var(--chart-2); }
@@ -74,12 +77,11 @@
 .an-svg:has(.an-bar.is-active) .an-bar:not(.is-active) { opacity: 0.45; }
 
 .an-tip {
-  position: absolute; top: 0; z-index: var(--z-tooltip); transform: translateX(12px);
+  position: absolute; top: 0; z-index: var(--z-tooltip);
   display: grid; gap: var(--space-3xs); min-width: 168px; padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-input); background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-rule), var(--shadow-lift);
   pointer-events: none; font-size: var(--text-sm); color: var(--color-ink-2);
 }
-.an-tip--flip { transform: translateX(calc(-100% - 12px)); }
 .an-tip__when { font-size: var(--text-xs); color: var(--color-muted); }
 .an-tip__row { display: flex; align-items: center; gap: var(--space-xs); }
 .an-tip__row strong { color: var(--color-ink); font-weight: 700; }
@@ -87,6 +89,15 @@
 .an-tip__key { width: 12px; height: 2px; border-radius: 1px; flex: none; }
 .an-tip__key--views { background: var(--chart-1); }
 .an-tip__key--clicks { background: var(--chart-2); }
+
+/* The phone reading: one reserved block above the plot, so a finger never hides it and the chart never jumps. */
+.an-readout { display: grid; align-content: center; gap: var(--space-3xs); min-height: 3.25rem; margin-bottom: var(--space-xs); padding: var(--space-2xs) var(--space-sm); border-radius: var(--radius-input); background: var(--color-paper-2); font-size: var(--text-sm); color: var(--color-ink-2); }
+.an-readout__when { font-size: var(--text-xs); color: var(--color-muted); }
+.an-readout__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2xs) var(--space-xs); }
+.an-readout__row strong { color: var(--color-ink); font-weight: 700; }
+.an-readout__row .an-tip__key + strong { margin-left: calc(-1 * var(--space-2xs)); }
+.an-readout__row .an-tip__key:not(:first-child) { margin-left: var(--space-xs); }
+.an-readout__hint { color: var(--color-muted); }
 
 /* ---------- bar lists ---------- */
 
@@ -101,16 +112,19 @@
 .an-social { display: inline-flex; align-items: center; gap: var(--space-xs); }
 .an-social svg { color: var(--color-ink-2); }
 
-/* ---------- tables: horizontal rules only; scroll inside their box on a phone ---------- */
+/* ---------- tables: horizontal rules only; scroll inside their box, the first column pinned ---------- */
 
-.an-table-wrap { overflow-x: auto; min-width: 0; margin-inline: calc(var(--space-lg) * -1); padding-inline: var(--space-lg); }
+/* The box runs to the panel's edges and the cells carry the inset, so a pinned first column covers what scrolls under it. */
+.an-table-wrap { --inset: var(--space-lg); overflow-x: auto; overscroll-behavior-x: contain; min-width: 0; margin-inline: calc(var(--inset) * -1); }
 .an-table-wrap--log { max-height: 30rem; overflow-y: auto; }
 .an-table-wrap:focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
 .an-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 .an-table th, .an-table td { padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--color-rule); text-align: left; vertical-align: middle; }
-.an-table th:first-child, .an-table td:first-child { padding-left: 0; }
-.an-table th:last-child, .an-table td:last-child { padding-right: 0; }
-.an-table thead th { font-weight: 500; color: var(--color-muted); white-space: nowrap; background: var(--color-surface); position: sticky; top: 0; }
+.an-table th:first-child, .an-table td:first-child { padding-left: var(--inset, 0); }
+.an-table th:last-child, .an-table td:last-child { padding-right: var(--inset, 0); }
+.an-table thead th { font-weight: 500; color: var(--color-muted); white-space: nowrap; background: var(--color-surface); position: sticky; top: 0; z-index: 1; }
+.an-table tr > :first-child { position: sticky; left: 0; background: var(--color-surface); }
+.an-table thead tr > :first-child { z-index: 2; }
 .an-table tbody th { font-weight: 500; color: var(--color-ink); }
 .an-table tbody tr:last-child > * { border-bottom: 0; }
 .an-table .num-col { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -124,6 +138,14 @@
 .an-sharebar__pct { text-align: right; color: var(--color-ink-2); }
 .an-log-time { white-space: nowrap; color: var(--color-ink-2); }
 .an-log-detail { overflow-wrap: anywhere; color: var(--color-ink-2); }
+
+/* Recent activity on a phone: a list, newest first. */
+.an-log { display: grid; margin: 0; padding: 0; list-style: none; max-height: 30rem; overflow-y: auto; overscroll-behavior: contain; }
+.an-log__item { display: grid; gap: var(--space-3xs); padding: var(--space-xs) 0; border-bottom: 1px solid var(--color-rule); }
+.an-log__item:last-child { border-bottom: 0; }
+.an-log__detail { color: var(--color-ink); font-weight: 500; overflow-wrap: anywhere; }
+.an-log__meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2xs) var(--space-sm); font-size: var(--text-sm); color: var(--color-muted); }
+.an-log__meta time { color: var(--color-ink-2); white-space: nowrap; }
 
 /* ---------- pipeline ---------- */
 
@@ -139,7 +161,7 @@
 /* ---------- export menu ---------- */
 
 .an-menu { position: relative; }
-.an-menu__list { position: absolute; right: 0; top: calc(100% + var(--space-xs)); z-index: var(--z-dropdown); display: grid; min-width: 15rem; padding: var(--space-2xs); }
+.an-menu__list { position: absolute; right: 0; top: calc(100% + var(--space-xs)); z-index: var(--z-dropdown); display: grid; width: max-content; min-width: min(15rem, calc(100dvw - 2 * var(--space-md))); max-width: calc(100dvw - 2 * var(--space-md)); padding: var(--space-2xs); }
 .an-menu__item {
   display: grid; gap: 0; justify-items: start; min-height: 44px; padding: var(--space-xs) var(--space-sm);
   border: 0; border-radius: 8px; background: transparent; color: var(--color-ink); text-align: left; cursor: pointer;
@@ -169,16 +191,23 @@
   .an-stat:nth-child(3) { border-left: 0; }
 }
 @media (max-width: 40rem) {
-  .an { padding: var(--space-md) var(--space-md) var(--space-xl); gap: var(--space-md); }
+  .an { padding: var(--space-md) max(var(--space-md), env(safe-area-inset-right)) var(--space-xl) max(var(--space-md), env(safe-area-inset-left)); gap: var(--space-md); }
   .an-head { align-items: stretch; }
-  .an-controls { width: 100%; }
-  .an-controls .segmented { width: 100%; }
-  .an-controls .segmented__option { flex: 1; }
-  .an-controls .segmented__option > span { width: 100%; justify-content: center; }
+  /* The range keys take the whole first row, four equal keys; the sample switch and Export share the second, Export at the thumb's side. */
+  .an-controls { width: 100%; justify-content: space-between; gap: var(--space-xs) var(--space-sm); }
+  .an-controls .segmented { width: 100%; flex-wrap: nowrap; }
+  .an-controls .segmented__option { flex: 1 1 0; min-width: 0; }
+  .an-controls .segmented__option > span { width: 100%; justify-content: center; padding-inline: var(--space-2xs); white-space: nowrap; }
   .an-panel { padding: var(--space-md); }
-  .an-table-wrap { margin-inline: calc(var(--space-md) * -1); padding-inline: var(--space-md); }
+  .an-panel__head { gap: var(--space-xs); }
+  .an-table-wrap { --inset: var(--space-md); }
+  /* A pinned column with a rule on its edge, narrow enough to leave the numbers room. */
+  .an-table tr > :first-child { box-shadow: inset -1px 0 0 var(--color-rule); padding-right: var(--space-sm); }
+  .an-table--links tbody th { min-width: 8.5rem; max-width: 10.5rem; }
+  .an-stats { padding: var(--space-sm) 0; }
   .an-stat { padding-inline: var(--space-md); }
   .an-stat__value { font-size: var(--text-xl); }
   .an-empty { padding: var(--space-lg); }
-  .an-menu__list { right: auto; left: 0; }
+  .an-confirm__actions { display: grid; gap: var(--space-sm); }
+  .an-confirm__actions .btn { width: 100%; }
 }

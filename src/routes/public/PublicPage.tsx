@@ -5,7 +5,7 @@ import type { LinkItem, PublicPage as PublicPageData, SocialId } from '../../lib
 import { pageAddress } from '../../lib/url'
 import { track } from '../../analytics'
 import { ProfileView } from '../../profile/ProfileView'
-import { Button, Skeleton } from '../../ui/controls'
+import { Button, Skeleton, Wordmark } from '../../ui/controls'
 import { useTitle } from '../../ui/hooks'
 import { Missing } from './Missing'
 import './public.css'
@@ -70,8 +70,11 @@ export default function PublicPage() {
   }
   if (state.status === 'error') {
     return (
-      <div className="app-scope grain missing" role="alert">
-        <main className="missing__body">
+      <div className="app-scope grain missing">
+        <header className="missing__bar">
+          <Wordmark />
+        </header>
+        <main className="missing__body" role="alert">
           <h1 className="missing__title">This page did not load</h1>
           <p className="missing__text">Something went wrong reading it in this browser. Try again in a moment.</p>
           <div className="missing__actions">

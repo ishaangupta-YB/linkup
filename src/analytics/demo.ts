@@ -211,7 +211,10 @@ function build(pageId: string, handle: string, links: { id: string; title: strin
       const src = back && rand() < 0.5 ? { source: 'Direct', referrer: '' } : SOURCES(rand())
       const context = contextFor(v, src)
       const sessionId = `sample-s${(sessionCount++).toString(36)}`
-      let ts = dayStart + HOURS(rand()) * 3_600_000 + Math.floor(rand() * 3_600_000)
+      // The local clock hour, set on the calendar day, so a 23- or 25-hour day never spills into the next.
+      const clock = new Date(dayStart)
+      clock.setHours(HOURS(rand()), 0, 0, 0)
+      let ts = clock.getTime() + Math.floor(rand() * 3_600_000)
       const pages = rand() < 0.78 ? 1 : rand() < 0.75 ? 2 : 3
       for (let p = 0; p < pages && views < viewsToday; p++) {
         push('page_view', ts, v, sessionId, context, {})

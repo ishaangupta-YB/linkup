@@ -6,6 +6,7 @@ import { LIMITS, SITE_HOST } from '../../lib/types'
 import { track } from '../../analytics'
 import { Button, Skeleton, TextField } from '../../ui/controls'
 import { AddressLabel, AuthLayout } from './AuthLayout'
+import { useKeepSubmitInView } from './formKeys'
 import { suggestHandle } from './suggest'
 import { handleCheckHint, useHandleCheck } from './useHandleCheck'
 
@@ -23,6 +24,7 @@ export default function OnboardingPage() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const check = useHandleCheck(value)
 
   // Someone who already has a page skips this step.
@@ -36,6 +38,8 @@ export default function OnboardingPage() {
       live = false
     }
   }, [attempt])
+
+  useKeepSubmitInView(formRef, gate === 'ready')
 
   if (gate === 'has-page') return <Navigate to="/app/editor" replace />
 
@@ -92,15 +96,18 @@ export default function OnboardingPage() {
         </div>
       )}
       {gate === 'ready' && (
-        <form className="auth__form" onSubmit={onSubmit} noValidate>
+        <form ref={formRef} className="auth__form" onSubmit={onSubmit} noValidate>
           <TextField
             ref={inputRef}
             label="Page address"
             name="handle"
             prefix={`${SITE_HOST}/`}
+            // Not "username": the login is the email, and a password manager would offer saved emails here.
             autoComplete="off"
             autoCapitalize="off"
+            autoCorrect="off"
             spellCheck={false}
+            enterKeyHint="go"
             required
             aria-required="true"
             maxLength={LIMITS.handleMax}

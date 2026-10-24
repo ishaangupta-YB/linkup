@@ -1,9 +1,9 @@
 /* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
- * nav: the shell's top bar, Settings tab current · signature: the page address and publish time in DM Mono, read like a label · states: loading, error, busy, success, full · dose: white
+ * nav: the shell's top bar, Settings tab current · signature: the page address and publish time in DM Mono, read like a label; delete set apart below a wider gap, confirmations as full-width stacked buttons on a phone · states: loading, error, busy, success, full · dose: white
  * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S3 R4 V4 · weakest: S, settings stay plain white surfaces on purpose; the material is in the controls */
 
-.settings { width: min(760px, 100% - 2 * var(--space-md)); margin: 0 auto; padding: var(--space-xl) 0 var(--space-2xl); }
+.settings { width: min(760px, 100% - 2 * max(var(--space-md), env(safe-area-inset-left), env(safe-area-inset-right))); margin: 0 auto; padding: var(--space-xl) 0 var(--space-2xl); }
 .settings__head { margin-bottom: var(--space-lg); }
 .settings__head h1 { font-size: var(--text-3xl); text-wrap: balance; }
 .settings__sections { display: grid; gap: var(--space-lg); }
@@ -14,6 +14,8 @@
 .set-section__intro { color: var(--color-ink-2); font-size: var(--text-sm); max-width: 60ch; }
 .set-section__body { display: grid; gap: var(--space-md); }
 .set-section--danger { box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-error) 30%, var(--color-rule)), var(--shadow-card); }
+/* The one destructive section stands apart from the rest, so it is never reached by a slip of the thumb. */
+.settings__sections > .set-section--danger { margin-top: var(--space-xl); }
 
 .set-form { display: grid; gap: var(--space-md); }
 .set-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); align-items: start; }
@@ -50,6 +52,8 @@
 
 .set-toggles { display: grid; margin: 0; padding: 0; list-style: none; }
 .set-toggles li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding: var(--space-sm) 0; border-top: 1px solid var(--color-rule); }
+.set-toggles li > div { min-width: 0; }
+.set-toggles li > .toggle { flex: none; }
 .set-toggles li:last-child { border-bottom: 1px solid var(--color-rule); }
 .set-toggles__name { font-weight: 500; }
 .set-toggles li:has(input:disabled) .set-toggles__name { color: var(--color-muted); }
@@ -66,4 +70,12 @@
   .set-section { padding: var(--space-md); }
   .set-grid { grid-template-columns: minmax(0, 1fr); }
   .set-facts > div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  /* Actions run the width of the section, at the thumb; the result line sits under them. */
+  .set-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); }
+  .set-actions .btn { width: 100%; }
+  .set-result { justify-content: center; text-align: center; }
+  /* A confirmation stacks its two answers with room between them. */
+  .set-confirm { padding: var(--space-sm); }
+  .set-confirm .set-actions { gap: var(--space-sm); }
+  .settings__sections > .set-section--danger { margin-top: var(--space-lg); }
 }

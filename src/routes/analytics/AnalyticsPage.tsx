@@ -166,17 +166,16 @@ function Dashboard({ page }: { page: Page }) {
             <p className="an-banner" role="note">
               <Icon name="alert" size={18} />
               <span>
-                These numbers include generated sample data, so the page does not start empty.{' '}
+                <strong>Sample data is on.</strong>{' '}
                 {computed.realInRange === 0
-                  ? 'None of the events in this range are real yet.'
-                  : `${formatCount(computed.realInRange)} of the ${formatCount(computed.inRange.length)} events in this range are real visits recorded in this browser.`}{' '}
-                Turn off sample data to see only real ones.
+                  ? 'These numbers are generated so the dashboard is not empty; none are real visits yet.'
+                  : `${formatCount(computed.realInRange)} of the ${formatCount(computed.inRange.length)} events in this range are real, recorded in this browser; the rest are generated.`}
               </span>
             </p>
           )}
           <DashboardBody result={computed.result} bounds={bounds} compact={compact} links={links} />
           <div className="an-grid">
-            <RecentActivity events={computed.real} links={links} now={store.now} />
+            <RecentActivity events={computed.real} links={links} now={store.now} compact={compact} />
             <PipelinePanel total={store.events.length} />
           </div>
         </>
@@ -281,7 +280,7 @@ function DashboardBody({ result, bounds, compact, links }: { result: Aggregate; 
           <BarList rows={toRows(result.devices, (k) => DEVICE_LABELS[k] ?? k)} empty="No visits in this range." />
         </ChartPanel>
         <ChartPanel title="Hours of day" note="Page views by your local time" view={hoursView} onView={setHoursView} table={<HoursTable hours={result.hours} />}>
-          <HoursChart hours={result.hours} />
+          <HoursChart hours={result.hours} compact={compact} />
         </ChartPanel>
         <ChartPanel title="Social icons" note={`${formatCount(result.totals.socialClicks)} taps on your social icons, ${formatCount(result.totals.shares)} shares`} view={socialsView} onView={setSocialsView} table={<BarTable rows={toRows(result.socials, socialLabel)} head="Icon" empty="No taps on social icons in this range." />}>
           <BarList rows={toRows(result.socials, socialLabel)} empty="No taps on social icons in this range." />
@@ -305,7 +304,7 @@ function LinkTable({ result, links }: { result: Aggregate; links: Page['draft'][
       {links.length === 0 ? (
         <p className="an-none">Your page has no links yet. Add one in the editor and its clicks show up here.</p>
       ) : (
-        <div className="an-table-wrap" tabIndex={0}>
+        <div className="an-table-wrap" tabIndex={0} role="region" aria-labelledby={id}>
           <table className="an-table an-table--links">
             <thead>
               <tr>
@@ -360,7 +359,7 @@ function ShareBar({ share, max, quiet }: { share: number; max: number; quiet?: b
   )
 }
 
-function RecentActivity({ events, links, now }: { events: AnalyticsEvent[]; links: Page['draft']['links']; now: number }) {
+function RecentActivity({ events, links, now, compact }: { events: AnalyticsEvent[]; links: Page['draft']['links']; now: number; compact: boolean }) {
   const id = useId()
   const recent = events.slice(-20).reverse()
   const today = new Date(now).toDateString()
@@ -377,6 +376,7 @@ function RecentActivity({ events, links, now }: { events: AnalyticsEvent[]; link
     if (e.name === 'share_click') return 'Shared the page'
     return `${e.context?.source ?? 'Direct'}, ${DEVICE_LABELS[e.context?.device] ?? e.context?.device ?? 'unknown device'}`
   }
+  const when = (e: AnalyticsEvent) => (new Date(e.ts).toDateString() === today ? formatClock(e.ts) : `${formatDay(e.ts)} ${formatClock(e.ts)}`)
   return (
     <section className="an-panel surface" aria-labelledby={id}>
       <header className="an-panel__head">
@@ -387,8 +387,23 @@ function RecentActivity({ events, links, now }: { events: AnalyticsEvent[]; link
       </header>
       {recent.length === 0 ? (
         <p className="an-none">No real visits recorded in this browser yet. Open your page in another tab and tap a link; it shows up here at once.</p>
+      ) : compact ? (
+        // On a phone each event is a two-line entry: what it was about, then the kind and the time.
+        <ol className="an-log">
+          {recent.map((e) => (
+            <li key={e.id} className="an-log__item">
+              <p className="an-log__detail">{detail(e)}</p>
+              <p className="an-log__meta">
+                <span>{EVENT_LABELS[e.name] ?? e.name}</span>
+                <time className="mono" dateTime={new Date(e.ts).toISOString()}>
+                  {when(e)}
+                </time>
+              </p>
+            </li>
+          ))}
+        </ol>
       ) : (
-        <div className="an-table-wrap an-table-wrap--log" tabIndex={0}>
+        <div className="an-table-wrap an-table-wrap--log" tabIndex={0} role="region" aria-labelledby={id}>
           <table className="an-table an-table--log">
             <thead>
               <tr>
@@ -400,9 +415,7 @@ function RecentActivity({ events, links, now }: { events: AnalyticsEvent[]; link
             <tbody>
               {recent.map((e) => (
                 <tr key={e.id}>
-                  <td className="mono an-log-time">
-                    {new Date(e.ts).toDateString() === today ? formatClock(e.ts) : `${formatDay(e.ts)} ${formatClock(e.ts)}`}
-                  </td>
+                  <td className="mono an-log-time">{when(e)}</td>
                   <td>{EVENT_LABELS[e.name] ?? e.name}</td>
                   <td className="an-log-detail">{detail(e)}</td>
                 </tr>
@@ -500,11 +513,12 @@ function ExportMenu({ disabled, onExport }: { disabled: boolean; onExport: (f: '
   useEffect(() => {
     if (!open) return
     itemRefs.current[0]?.focus()
-    const onDoc = (e: MouseEvent) => {
+    // pointerdown, not mousedown: a tap outside closes the menu on touch screens too.
+    const onDoc = (e: globalThis.PointerEvent) => {
       if (!wrapRef.current?.contains(e.target as Node)) setOpen(false)
     }
-    document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
+    document.addEventListener('pointerdown', onDoc)
+    return () => document.removeEventListener('pointerdown', onDoc)
   }, [open])
 
   function close() {

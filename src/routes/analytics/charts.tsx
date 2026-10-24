@@ -1,5 +1,5 @@
 /* Hand-rolled SVG charts for the dashboard. No chart library: each chart is drawn for its data. */
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import type { Bucket, SeriesPoint } from '../../analytics/aggregate'
 import { Segmented } from '../../ui/controls'
 import { formatClock, formatCompact, formatCount, formatDay, formatHour, formatPercent, formatWeekday, niceTicks } from './format'
@@ -23,7 +23,8 @@ function useWidth<T extends HTMLElement>() {
 
 /** Arrow keys, Home and End move a reading position across n points. */
 function indexKeys(n: number, active: number | null, set: (i: number | null) => void) {
-  return (e: KeyboardEvent) => {
+  return (e: KeyboardEvent<HTMLElement>) => {
+    delete e.currentTarget.dataset.touch
     if (n === 0) return
     const current = active ?? n - 1
     let next: number | null = null
@@ -39,6 +40,66 @@ function indexKeys(n: number, active: number | null, set: (i: number | null) => 
     e.preventDefault()
     set(next)
   }
+}
+
+/**
+ * Pointer reading for a chart. A mouse reads where it hovers and lets go when it leaves; a finger
+ * taps or drags across the plot and the reading stays where it lifted, until a tap elsewhere blurs the chart.
+ * A vertical drag still scrolls the page (touch-action: pan-y), which cancels the drag, not the reading.
+ */
+function useScrub(n: number, indexAt: (svgX: number) => number, set: (i: number | null) => void) {
+  const dragging = useRef(false)
+  const read = (e: PointerEvent<SVGRectElement>) => {
+    if (n === 0) return
+    const box = (e.currentTarget.ownerSVGElement ?? e.currentTarget).getBoundingClientRect()
+    const i = indexAt(e.clientX - box.left)
+    set(Math.max(0, Math.min(n - 1, Number.isFinite(i) ? i : 0)))
+  }
+  return {
+    onPointerDown: (e: PointerEvent<SVGRectElement>) => {
+      if (e.pointerType !== 'mouse') {
+        // A drag never makes a click, so focus the chart by hand: tapping anywhere else then blurs it and clears the reading.
+        const chart = e.currentTarget.closest<HTMLElement>('[tabindex]')
+        if (chart) {
+          // Marked as touched, so the keyboard focus ring stays off until a key is pressed.
+          chart.dataset.touch = ''
+          chart.focus({ preventScroll: true })
+        }
+        dragging.current = true
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId)
+        } catch {
+          // Capture is a nicety; without it the drag reads only inside the plot.
+        }
+      }
+      read(e)
+    },
+    onPointerMove: (e: PointerEvent<SVGRectElement>) => {
+      if (e.pointerType === 'mouse' || dragging.current) read(e)
+    },
+    onPointerUp: () => void (dragging.current = false),
+    onPointerCancel: () => void (dragging.current = false),
+    onPointerLeave: (e: PointerEvent<SVGRectElement>) => {
+      if (e.pointerType === 'mouse') set(null)
+    },
+  }
+}
+
+/**
+ * Where a floating tooltip goes: beside the reading, on the side with room, and never past
+ * either edge of the chart.
+ */
+function useTipPosition(anchor: number, chartWidth: number, active: number | null) {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [tipWidth, setTipWidth] = useState(180)
+  useLayoutEffect(() => {
+    if (active != null && ref.current) setTipWidth(ref.current.offsetWidth)
+  }, [active])
+  const gap = 12
+  const right = anchor + gap
+  const left = anchor - gap - tipWidth
+  const preferred = right + tipWidth <= chartWidth ? right : left >= 0 ? left : right
+  return { ref, left: Math.max(0, Math.min(preferred, chartWidth - tipWidth)) }
 }
 
 export type ChartView = 'chart' | 'table'
@@ -130,29 +191,45 @@ export function TrafficChart({ series, bucket, compact }: { series: SeriesPoint[
     .map((p, i) => ({ i, text: bucket === 'hour' ? formatClock(p.start) : formatDay(p.start) }))
     .filter(({ i }) => (n - 1 - i) % labelEvery === 0)
 
-  function onPointer(e: PointerEvent<SVGRectElement>) {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const px = e.clientX - rect.left
-    const i = n <= 1 ? 0 : Math.round((px / rect.width) * (n - 1))
-    setActive(Math.max(0, Math.min(n - 1, i)))
-  }
+  const scrub = useScrub(n, (sx) => (n <= 1 || w === 0 ? 0 : Math.round(((sx - m.left) / w) * (n - 1))), setActive)
 
   const point = active != null ? series[active] : null
-  const tipLeft = active != null ? x(active) : 0
-  const flip = tipLeft > width / 2
+  const { ref: tipRef, left: tipLeft } = useTipPosition(active != null ? x(active) : 0, width, active)
+  const unit = bucket === 'hour' ? 'hour' : 'day'
 
   return (
     <div className="an-chart" ref={wrapRef}>
+      {compact && (
+        // On a phone the reading sits above the plot, clear of the finger, in a line that never moves the chart.
+        <div className="an-readout" aria-hidden="true">
+          {point ? (
+            <>
+              <p className="an-readout__when">{pointLabel(point, bucket)}</p>
+              <p className="an-readout__row">
+                <span className="an-tip__key an-tip__key--views" />
+                <strong className="num">{formatCount(point.views)}</strong> views
+                <span className="an-tip__key an-tip__key--clicks" />
+                <strong className="num">{formatCount(point.clicks)}</strong> clicks
+              </p>
+            </>
+          ) : (
+            <p className="an-readout__hint">Tap or drag to read each {unit}.</p>
+          )}
+        </div>
+      )}
       <div
         className="an-chart__focus"
         tabIndex={0}
         role="group"
         aria-roledescription="chart"
-        aria-label={`Views and link clicks by ${bucket === 'hour' ? 'hour' : 'day'}. Use the arrow keys to read each ${bucket === 'hour' ? 'hour' : 'day'}.`}
+        aria-label={`Views and link clicks by ${unit}. Use the arrow keys to read each ${unit}.`}
         aria-describedby={descId}
         onKeyDown={indexKeys(n, active, setActive)}
         onFocus={() => setActive((a) => a ?? n - 1)}
-        onBlur={() => setActive(null)}
+        onBlur={(e) => {
+          delete e.currentTarget.dataset.touch
+          setActive(null)
+        }}
       >
         {width > 0 && (
           <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true" className="an-svg">
@@ -175,24 +252,16 @@ export function TrafficChart({ series, bucket, compact }: { series: SeriesPoint[
             {point && active != null && (
               <g>
                 <line className="an-crosshair" x1={x(active)} x2={x(active)} y1={m.top} y2={m.top + h} />
-                <circle className="an-dot an-dot--views" cx={x(active)} cy={y(point.views)} r={4} />
-                <circle className="an-dot an-dot--clicks" cx={x(active)} cy={y(point.clicks)} r={4} />
+                <circle className="an-dot an-dot--views" cx={x(active)} cy={y(point.views)} r={compact ? 6 : 4} />
+                <circle className="an-dot an-dot--clicks" cx={x(active)} cy={y(point.clicks)} r={compact ? 6 : 4} />
               </g>
             )}
-            <rect
-              className="an-hit"
-              x={m.left}
-              y={m.top}
-              width={w}
-              height={h}
-              onPointerMove={onPointer}
-              onPointerDown={onPointer}
-              onPointerLeave={() => setActive(null)}
-            />
+            {/* The hit area runs past the plot by a few pixels each side, so the first and last day are easy to reach with a thumb. */}
+            <rect className="an-hit" x={m.left - 8} y={0} width={w + 16} height={m.top + h + 8} {...scrub} />
           </svg>
         )}
-        {point && (
-          <div className={flip ? 'an-tip an-tip--flip' : 'an-tip'} style={{ left: tipLeft }} aria-hidden="true">
+        {point && !compact && (
+          <div className="an-tip" ref={tipRef} style={{ left: tipLeft }} aria-hidden="true">
             <p className="an-tip__when">{pointLabel(point, bucket)}</p>
             <p className="an-tip__row">
               <span className="an-tip__key an-tip__key--views" />
@@ -246,7 +315,7 @@ export function TrafficTable({ series, bucket }: { series: SeriesPoint[]; bucket
 }
 
 /** Page views by hour of day: 24 columns from one baseline. */
-export function HoursChart({ hours }: { hours: number[] }) {
+export function HoursChart({ hours, compact = false }: { hours: number[]; compact?: boolean }) {
   const [wrapRef, width] = useWidth<HTMLDivElement>()
   const [active, setActive] = useState<number | null>(null)
   const descId = useId()
@@ -263,9 +332,27 @@ export function HoursChart({ hours }: { hours: number[] }) {
   const total = hours.reduce((s, v) => s + v, 0)
   const value = active != null ? hours[active] : 0
   const r = Math.min(2, bar / 2)
+  // One hit area over the whole plot, so a finger dragging across the columns reads each in turn.
+  const scrub = useScrub(24, (sx) => (slot ? Math.floor((sx - m.left) / slot) : 0), setActive)
+  const { ref: tipRef, left: tipLeft } = useTipPosition(active != null ? m.left + active * slot + slot / 2 : 0, width, active)
+  const when = active != null ? `${formatHour(active)} to ${formatHour((active + 1) % 24)}` : ''
 
   return (
     <div className="an-chart" ref={wrapRef}>
+      {compact && (
+        <div className="an-readout" aria-hidden="true">
+          {active != null ? (
+            <>
+              <p className="an-readout__when mono">{when}</p>
+              <p className="an-readout__row">
+                <strong className="num">{formatCount(value)}</strong> views, {total ? formatPercent(value / total) : '0%'} of the day
+              </p>
+            </>
+          ) : (
+            <p className="an-readout__hint">Tap or drag to read each hour.</p>
+          )}
+        </div>
+      )}
       <div
         className="an-chart__focus"
         tabIndex={0}
@@ -275,8 +362,10 @@ export function HoursChart({ hours }: { hours: number[] }) {
         aria-describedby={descId}
         onKeyDown={indexKeys(24, active, setActive)}
         onFocus={() => setActive((a) => a ?? hours.indexOf(max))}
-        onBlur={() => setActive(null)}
-        onPointerLeave={() => setActive(null)}
+        onBlur={(e) => {
+          delete e.currentTarget.dataset.touch
+          setActive(null)
+        }}
       >
         {width > 0 && (
           <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true" className="an-svg">
@@ -292,30 +381,25 @@ export function HoursChart({ hours }: { hours: number[] }) {
               const bx = m.left + i * slot + (slot - bar) / 2
               const by = y(v)
               const bh = m.top + h - by
-              return (
-                <g key={i}>
-                  {bh > 0 && (
-                    <path
-                      className={active === i ? 'an-bar is-active' : 'an-bar'}
-                      d={`M${bx},${m.top + h}V${by + r}Q${bx},${by} ${bx + r},${by}H${bx + bar - r}Q${bx + bar},${by} ${bx + bar},${by + r}V${m.top + h}Z`}
-                    />
-                  )}
-                  <rect className="an-hit" x={m.left + i * slot} y={m.top} width={slot} height={h} onPointerEnter={() => setActive(i)} onPointerDown={() => setActive(i)} />
-                </g>
-              )
+              return bh > 0 ? (
+                <path
+                  key={i}
+                  className={active === i ? 'an-bar is-active' : 'an-bar'}
+                  d={`M${bx},${m.top + h}V${by + r}Q${bx},${by} ${bx + r},${by}H${bx + bar - r}Q${bx + bar},${by} ${bx + bar},${by + r}V${m.top + h}Z`}
+                />
+              ) : null
             })}
             {[0, 6, 12, 18, 23].map((hr) => (
               <text key={hr} className="an-axis" x={m.left + hr * slot + slot / 2} y={height - 8} textAnchor={hr === 23 ? 'end' : hr === 0 ? 'start' : 'middle'}>
                 {formatHour(hr)}
               </text>
             ))}
+            <rect className="an-hit" x={m.left} y={0} width={w} height={m.top + h + 8} {...scrub} />
           </svg>
         )}
-        {active != null && (
-          <div className={m.left + active * slot > width / 2 ? 'an-tip an-tip--flip' : 'an-tip'} style={{ left: m.left + active * slot + slot / 2 }} aria-hidden="true">
-            <p className="an-tip__when mono">
-              {formatHour(active)} to {formatHour((active + 1) % 24)}
-            </p>
+        {active != null && !compact && (
+          <div className="an-tip" ref={tipRef} style={{ left: tipLeft }} aria-hidden="true">
+            <p className="an-tip__when mono">{when}</p>
             <p className="an-tip__row">
               <strong className="num">{formatCount(value)}</strong> views
             </p>

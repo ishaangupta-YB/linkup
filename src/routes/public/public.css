@@ -1,5 +1,5 @@
 /* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
- * nav: wordmark only on the missing screens, none on a live page · signature: the missing address set in DM Mono like a label that was never printed · states: loading, missing, error, full · dose: white
+ * nav: wordmark only on the missing and error screens, none on a live page · signature: the missing address set in DM Mono like a label that was never printed · states: loading, missing, error, full · dose: white
  * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S3 R4 V4 · weakest: S, the missing screens stay quiet on purpose; the live page is ProfileView's */
 /* Hallmark · waive 26b · the only controls here are ui.css .btn links and buttons, which carry :disabled · the missing and error screens own no form control of their own */
@@ -9,7 +9,10 @@
 
 /* ---------- loading: the page's own shape ---------- */
 
-.public-sk { min-height: 100dvh; display: flex; justify-content: center; padding: var(--space-3xl) var(--space-md) var(--space-2xl); }
+.public-sk {
+  min-height: 100dvh; display: flex; justify-content: center;
+  padding: calc(var(--space-3xl) + env(safe-area-inset-top)) max(var(--space-md), env(safe-area-inset-right)) calc(var(--space-2xl) + env(safe-area-inset-bottom)) max(var(--space-md), env(safe-area-inset-left));
+}
 .public-sk__col { width: min(480px, 100%); display: grid; justify-items: center; align-content: start; gap: var(--space-sm); }
 .public-sk__photo { width: 96px; height: 96px; border-radius: 50%; margin-bottom: var(--space-xs); }
 .public-sk__name { width: 55%; height: 28px; }
@@ -20,10 +23,13 @@
 
 /* ---------- missing and error ---------- */
 
-.missing { min-height: 100dvh; display: grid; grid-template-rows: auto 1fr; }
+.missing {
+  min-height: 100dvh; display: grid; grid-template-rows: auto 1fr;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
 .missing__bar { display: flex; align-items: center; height: 64px; padding: 0 var(--space-lg); }
 .missing__body { width: min(560px, 100% - 2 * var(--space-md)); margin: 0 auto; padding: var(--space-3xl) 0 var(--space-2xl); display: grid; gap: var(--space-md); align-content: start; }
-.missing__title { font-size: var(--text-3xl); max-width: none; }
+.missing__title { font-size: var(--text-3xl); max-width: none; overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
 .missing__addr { font-family: var(--font-outlier); font-weight: 500; letter-spacing: 0; overflow-wrap: anywhere; color: var(--color-accent-deep); }
 .missing__text { color: var(--color-ink-2); max-width: 46ch; }
 .missing__text .mono { color: var(--color-ink); overflow-wrap: anywhere; }
@@ -35,6 +41,10 @@
 
 @media (max-width: 40rem) {
   .missing__bar { height: 56px; padding: 0 var(--space-md); }
-  .missing__body { padding-top: var(--space-2xl); }
+  .missing__body { padding-top: var(--space-xl); }
   .missing__title { font-size: var(--text-2xl); }
+  /* The way on is a full-width button at the thumb; the second way sits under it. */
+  .missing__actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); }
+  .missing__actions .btn { width: 100%; }
+  .public-sk { padding-top: calc(var(--space-2xl) + env(safe-area-inset-top)); }
 }

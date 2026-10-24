@@ -5,6 +5,7 @@ import { useAuth } from '../../lib/auth'
 import { LIMITS } from '../../lib/types'
 import { Button, TextField } from '../../ui/controls'
 import { AddressLabel, AuthLayout } from './AuthLayout'
+import { nextOnEnter, useKeepSubmitInView } from './formKeys'
 import { PasswordField } from './PasswordField'
 import { suggestHandle } from './suggest'
 
@@ -30,6 +31,8 @@ export default function SignUpPage() {
   const nameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  useKeepSubmitInView(formRef)
 
   // A visitor who is already signed in has nothing to do here. After our own submit we navigate ourselves.
   if (auth.status === 'signedIn' && !submitted) return <Navigate to="/app/editor" replace />
@@ -76,12 +79,15 @@ export default function SignUpPage() {
       lead="Your name, your links, one address to share."
       band={<AddressLabel handle={handle} note="You choose the address in the next step." />}
     >
-      <form className="auth__form" onSubmit={onSubmit} noValidate>
+      <form ref={formRef} className="auth__form" onSubmit={onSubmit} noValidate>
         <TextField
           ref={nameRef}
           label="Your name"
           name="name"
           autoComplete="name"
+          autoCapitalize="words"
+          enterKeyHint="next"
+          onKeyDown={nextOnEnter}
           required
           aria-required="true"
           maxLength={LIMITS.name}
@@ -99,7 +105,10 @@ export default function SignUpPage() {
           inputMode="email"
           autoComplete="email"
           autoCapitalize="off"
+          autoCorrect="off"
           spellCheck={false}
+          enterKeyHint="next"
+          onKeyDown={nextOnEnter}
           required
           aria-required="true"
           placeholder="name@example.com"
@@ -121,6 +130,7 @@ export default function SignUpPage() {
           label="Password"
           name="password"
           autoComplete="new-password"
+          enterKeyHint="go"
           required
           aria-required="true"
           value={values.password}

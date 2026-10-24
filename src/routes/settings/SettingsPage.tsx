@@ -1,4 +1,4 @@
-import { startTransition, useState, type FormEvent, type ReactNode } from 'react'
+import { startTransition, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import * as api from '../../lib/api'
 import { ApiError, emailProblem } from '../../lib/api'
@@ -10,6 +10,7 @@ import { flush, isOptedOut, setOptOut, track, transportName } from '../../analyt
 import { Button, Skeleton, TextField, Toggle } from '../../ui/controls'
 import { Icon } from '../../ui/Icon'
 import { useTitle } from '../../ui/hooks'
+import { nextOnEnter, useKeepSubmitInView } from '../auth/formKeys'
 import { PasswordField } from '../auth/PasswordField'
 import { handleCheckHint, useHandleCheck } from '../auth/useHandleCheck'
 import { formatStamp } from './format'
@@ -59,7 +60,7 @@ export default function SettingsPage() {
       ) : (
         <div className="settings__sections">
           <AccountSection account={account} onSaved={auth.setAccount} />
-          <PasswordSection />
+          <PasswordSection email={account.email} />
           <AddressSection page={my.page} onSaved={my.setPage} />
           <PublishingSection page={my.page} unpublish={my.unpublish} />
           <AnalyticsSection account={account} onSaved={auth.setAccount} />
@@ -96,6 +97,8 @@ function AccountSection({ account, onSaved }: { account: Account; onSaved: (a: A
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<Feedback>(null)
   const dirty = name.trim() !== account.name || email.trim().toLowerCase() !== account.email
+  const formRef = useRef<HTMLFormElement>(null)
+  useKeepSubmitInView(formRef)
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -121,12 +124,15 @@ function AccountSection({ account, onSaved }: { account: Account; onSaved: (a: A
 
   return (
     <Section id="set-account" title="Account" intro="Your name is also the name at the top of a new page.">
-      <form className="set-form" onSubmit={onSubmit} noValidate>
+      <form ref={formRef} className="set-form" onSubmit={onSubmit} noValidate>
         <div className="set-grid">
           <TextField
             label="Name"
             name="name"
             autoComplete="name"
+            autoCapitalize="words"
+            enterKeyHint="next"
+            onKeyDown={nextOnEnter}
             maxLength={LIMITS.name}
             value={name}
             onChange={(e) => {
@@ -143,7 +149,9 @@ function AccountSection({ account, onSaved }: { account: Account; onSaved: (a: A
             inputMode="email"
             autoComplete="email"
             autoCapitalize="off"
+            autoCorrect="off"
             spellCheck={false}
+            enterKeyHint="done"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value)
@@ -164,13 +172,15 @@ function AccountSection({ account, onSaved }: { account: Account; onSaved: (a: A
   )
 }
 
-function PasswordSection() {
+function PasswordSection({ email }: { email: string }) {
   const [current, setCurrent] = useState('')
   const [next, setNext] = useState('')
   const [errors, setErrors] = useState<{ current?: string | null; next?: string | null }>({})
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<Feedback>(null)
   const nextIssue = (v: string) => (v.length >= LIMITS.passwordMin ? null : `Use at least ${LIMITS.passwordMin} characters.`)
+  const formRef = useRef<HTMLFormElement>(null)
+  useKeepSubmitInView(formRef)
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -194,12 +204,16 @@ function PasswordSection() {
 
   return (
     <Section id="set-password" title="Password">
-      <form className="set-form" onSubmit={onSubmit} noValidate>
+      <form ref={formRef} className="set-form" onSubmit={onSubmit} noValidate>
+        {/* Tells a password manager which saved login this change belongs to. */}
+        <input type="email" name="username" autoComplete="username" value={email} readOnly hidden />
         <div className="set-grid">
           <PasswordField
             label="Current password"
             name="current-password"
             autoComplete="current-password"
+            enterKeyHint="next"
+            onKeyDown={nextOnEnter}
             value={current}
             onChange={(e) => {
               setCurrent(e.target.value)
@@ -211,6 +225,7 @@ function PasswordSection() {
             label="New password"
             name="new-password"
             autoComplete="new-password"
+            enterKeyHint="done"
             value={next}
             onChange={(e) => {
               setNext(e.target.value)
@@ -240,6 +255,8 @@ function AddressSection({ page, onSaved }: { page: Page; onSaved: (p: Page) => v
   const [feedback, setFeedback] = useState<Feedback>(null)
   const check = useHandleCheck(value, page.handle)
   const changing = check.status !== 'current' && check.handle !== ''
+  const formRef = useRef<HTMLFormElement>(null)
+  useKeepSubmitInView(formRef)
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -270,7 +287,7 @@ function AddressSection({ page, onSaved }: { page: Page; onSaved: (p: Page) => v
         </>
       }
     >
-      <form className="set-form" onSubmit={onSubmit} noValidate>
+      <form ref={formRef} className="set-form" onSubmit={onSubmit} noValidate>
         <div className="set-narrow">
           <TextField
             label="New address"
@@ -278,7 +295,9 @@ function AddressSection({ page, onSaved }: { page: Page; onSaved: (p: Page) => v
             prefix={`${SITE_HOST}/`}
             autoComplete="off"
             autoCapitalize="off"
+            autoCorrect="off"
             spellCheck={false}
+            enterKeyHint="done"
             maxLength={LIMITS.handleMax}
             value={value}
             onChange={(e) => {
@@ -446,6 +465,8 @@ function DeleteSection({ handle, onDeleted }: { handle: string; onDeleted: () =>
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const matches = typed.trim().toLowerCase() === handle
+  const formRef = useRef<HTMLFormElement>(null)
+  useKeepSubmitInView(formRef)
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -469,14 +490,16 @@ function DeleteSection({ handle, onDeleted }: { handle: string; onDeleted: () =>
 
   return (
     <Section id="set-danger" title="Delete account" danger intro="Deletes your account and your page. The address becomes free for anyone. This cannot be undone.">
-      <form className="set-form" onSubmit={onSubmit} noValidate>
+      <form ref={formRef} className="set-form" onSubmit={onSubmit} noValidate>
         <div className="set-narrow">
           <TextField
             label={`Type ${handle} to confirm`}
             name="confirm-handle"
             autoComplete="off"
             autoCapitalize="off"
+            autoCorrect="off"
             spellCheck={false}
+            enterKeyHint="done"
             value={typed}
             onChange={(e) => {
               setTyped(e.target.value)
@@ -486,7 +509,7 @@ function DeleteSection({ handle, onDeleted }: { handle: string; onDeleted: () =>
           />
         </div>
         <div className="set-actions">
-          <Button type="submit" size="sm" variant="danger" icon="trash" loading={busy} disabled={!matches && !busy} aria-describedby={matches ? undefined : "delete-why"}>
+          <Button type="submit" size="sm" variant="danger" icon="trash" loading={busy} disabled={!matches && !busy} aria-describedby={matches ? undefined : 'delete-why'}>
             {busy ? 'Deleting' : 'Delete my account'}
           </Button>
           {!matches && (

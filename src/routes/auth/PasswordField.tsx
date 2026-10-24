@@ -39,6 +39,8 @@ export function PasswordField({ label, hint, error, className, ref, ...rest }: P
           aria-label={shown ? 'Hide password' : 'Show password'}
           aria-pressed={shown}
           aria-controls={id}
+          // Keeps focus, and the on-screen keyboard, in the field while the password is shown or hidden.
+          onMouseDown={(e) => e.preventDefault()}
           onClick={() => setShown((s) => !s)}
         >
           <Icon name={shown ? 'eyeOff' : 'eye'} size={18} />
