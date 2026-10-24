@@ -1,79 +1,61 @@
-import { useCallback, useEffect, useState } from 'react'
-import { StoreProvider, useMediaQuery } from './store'
-import { ToastProvider } from './components/Toast'
-import { BottomBar, Topbar, ViewTabs, type AppView } from './components/Bars'
-import { ProfileSection } from './components/ProfileSection'
-import { LinksSection } from './components/LinksSection'
-import { SocialSection } from './components/SocialSection'
-import { LookSection } from './components/LookSection'
-import { LivePreview, PeekPreview, PreviewOverlay } from './components/Preview'
-import { AnalyticsPage } from './analytics/AnalyticsPage'
-import './App.css'
+import { lazy, Suspense, type ReactNode } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
+import { AuthProvider, RequireAuth } from './lib/auth'
+import { AppShell } from './shell/AppShell'
+import { ToastProvider } from './ui/Toast'
 
-function readView(): AppView {
-  return window.location.hash === '#analytics' ? 'analytics' : 'editor'
-}
+const LandingPage = lazy(() => import('./routes/landing/LandingPage'))
+const SignInPage = lazy(() => import('./routes/auth/SignInPage'))
+const SignUpPage = lazy(() => import('./routes/auth/SignUpPage'))
+const OnboardingPage = lazy(() => import('./routes/auth/OnboardingPage'))
+const EditorPage = lazy(() => import('./routes/editor/EditorPage'))
+const AnalyticsPage = lazy(() => import('./routes/analytics/AnalyticsPage'))
+const SettingsPage = lazy(() => import('./routes/settings/SettingsPage'))
+const PublicPage = lazy(() => import('./routes/public/PublicPage'))
+const NotFoundPage = lazy(() => import('./routes/public/NotFoundPage'))
 
-function useView() {
-  const [view, setView] = useState(readView)
-  useEffect(() => {
-    const onHash = () => {
-      setView(readView())
-      window.scrollTo(0, 0)
-    }
-    window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
-  }, [])
-  return view
-}
-
-function Editor() {
-  // Three-column workspace needs room for two 400px editor columns + the 390px device.
-  const compact = !useMediaQuery('(min-width: 1200px)')
-  const view = useView()
-  const [previewOpen, setPreviewOpen] = useState(false)
-  const openPreview = useCallback(() => setPreviewOpen(true), [])
-  const closePreview = useCallback(() => setPreviewOpen(false), [])
-
-  return (
-    <div className={compact ? 'editor editor--mobile' : 'editor'}>
-      <Topbar compact={compact} view={view} onPreview={openPreview} />
-      {compact && <ViewTabs view={view} className="view-tabs--mobile" />}
-      {view === 'analytics' ? (
-        <AnalyticsPage />
-      ) : compact ? (
-        <main className="workspace-mobile">
-          <PeekPreview />
-          <ProfileSection compact />
-          <LinksSection compact />
-          <SocialSection compact />
-          <LookSection compact />
-        </main>
-      ) : (
-        <main className="workspace">
-          <div className="panel">
-            <ProfileSection compact={false} />
-            <LinksSection compact={false} />
-          </div>
-          <div className="panel">
-            <SocialSection compact={false} />
-            <LookSection compact={false} />
-          </div>
-          <LivePreview />
-        </main>
-      )}
-      {compact && view === 'editor' && <BottomBar onPreview={openPreview} />}
-      {previewOpen && <PreviewOverlay onClose={closePreview} />}
-    </div>
-  )
+function Lazy({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<div className="route-loading" role="status" aria-label="Loading" />}>{children}</Suspense>
 }
 
 export default function App() {
   return (
-    <StoreProvider>
-      <ToastProvider>
-        <Editor />
-      </ToastProvider>
-    </StoreProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <ToastProvider>
+          <Lazy>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/signin" element={<SignInPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route
+                path="/onboarding"
+                element={
+                  <RequireAuth>
+                    <OnboardingPage />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/app"
+                element={
+                  <RequireAuth>
+                    <AppShell />
+                  </RequireAuth>
+                }
+              >
+                <Route index element={<Navigate to="editor" replace />} />
+                <Route path="editor" element={<Lazy><EditorPage /></Lazy>} />
+                <Route path="analytics" element={<Lazy><AnalyticsPage /></Lazy>} />
+                <Route path="settings" element={<Lazy><SettingsPage /></Lazy>} />
+                <Route path="*" element={<Navigate to="editor" replace />} />
+              </Route>
+              <Route path="/:handle" element={<PublicPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Lazy>
+        </ToastProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
