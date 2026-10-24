@@ -1,3 +1,4 @@
+/* Hallmark · waive 22 · --glint is oklch(100% 0 0) · Dose defines the glint as pure white, the highlight along the plastic's top edge */
 :root {
   color-scheme: light;
   --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
@@ -16,7 +17,7 @@
   --color-focus: oklch(45% 0.14 160);
   --p-mon: oklch(85% 0.052 22); --p-tue: oklch(87.5% 0.058 64); --p-wed: oklch(91.5% 0.064 98); --p-thu: oklch(86.5% 0.075 160);
   --p-fri: oklch(87% 0.048 210); --p-sat: oklch(84% 0.045 270); --p-sun: oklch(84% 0.048 322);
-  --light: oklch(99.4% 0.016 84); --glint: oklch(100% 0 0);
+  --light: oklch(99.4% 0.016 84); --glint: oklch(100% 0 0); --color-surface: oklch(99.6% 0.005 88);
   --font-display: "Schibsted Grotesk", ui-sans-serif, sans-serif; --font-body: "Instrument Sans", ui-sans-serif, sans-serif;
   --font-outlier: "DM Mono", ui-monospace, monospace;
   --radius-card: 14px; --radius-input: 10px; --radius-pill: 999px; --rule-hair: 1px;

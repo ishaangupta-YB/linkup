@@ -25,6 +25,8 @@ export function ProfileView({ content, handle, mode, onLinkClick, onSocialClick,
     (s): s is typeof s & { href: string } => !!s.href && isSafeHref(s.href),
   )
   const name = content.name.trim() || `@${handle}`
+  // The live page owns the document's h1; previews sit under their screen's own h1.
+  const Name = live ? 'h1' : 'h2'
 
   return (
     <div
@@ -48,7 +50,7 @@ export function ProfileView({ content, handle, mode, onLinkClick, onSocialClick,
               {initials(content.name, handle)}
             </span>
           )}
-          <h1 className="pv__name">{name}</h1>
+          <Name className="pv__name">{name}</Name>
           {content.tagline.trim() && <p className="pv__tagline">{content.tagline}</p>}
           {content.bio.trim() && <p className="pv__bio">{content.bio}</p>}
           {content.location.trim() && (

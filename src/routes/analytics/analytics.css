@@ -76,7 +76,7 @@
 .an-tip {
   position: absolute; top: 0; z-index: var(--z-tooltip); transform: translateX(12px);
   display: grid; gap: var(--space-3xs); min-width: 168px; padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-input); background: var(--glint); box-shadow: 0 0 0 1px var(--color-rule), var(--shadow-lift);
+  border-radius: var(--radius-input); background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-rule), var(--shadow-lift);
   pointer-events: none; font-size: var(--text-sm); color: var(--color-ink-2);
 }
 .an-tip--flip { transform: translateX(calc(-100% - 12px)); }
@@ -110,7 +110,7 @@
 .an-table th, .an-table td { padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--color-rule); text-align: left; vertical-align: middle; }
 .an-table th:first-child, .an-table td:first-child { padding-left: 0; }
 .an-table th:last-child, .an-table td:last-child { padding-right: 0; }
-.an-table thead th { font-weight: 500; color: var(--color-muted); white-space: nowrap; background: var(--glint); position: sticky; top: 0; }
+.an-table thead th { font-weight: 500; color: var(--color-muted); white-space: nowrap; background: var(--color-surface); position: sticky; top: 0; }
 .an-table tbody th { font-weight: 500; color: var(--color-ink); }
 .an-table tbody tr:last-child > * { border-bottom: 0; }
 .an-table .num-col { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }

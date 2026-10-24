@@ -108,7 +108,7 @@
 .map__node { position: relative; z-index: var(--z-base); }
 .map__node--source {
   display: flex; align-items: center; gap: var(--space-xs); min-height: 52px; padding: 0 var(--space-md);
-  border-radius: var(--radius-input); background: var(--glint); box-shadow: 0 0 0 1px var(--color-rule), 0 3px 0 var(--color-rule); font-weight: 500;
+  border-radius: var(--radius-input); background: var(--color-surface); box-shadow: 0 0 0 1px var(--color-rule), 0 3px 0 var(--color-rule); font-weight: 500;
 }
 .map__node--source svg { flex-shrink: 0; color: var(--color-accent-deep); }
 .map__node--page { display: grid; gap: var(--space-3xs); padding: var(--space-xl) var(--space-md); text-align: center; }

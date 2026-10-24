@@ -52,7 +52,7 @@
 .ed-link {
   position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: var(--space-xs); row-gap: var(--space-xs);
   padding: var(--space-md) 0; border-top: 1px solid var(--color-rule);
-  background: var(--glint); transform: translateY(var(--dy, 0));
+  background: var(--color-surface); transform: translateY(var(--dy, 0));
 }
 .ed-link:first-child { border-top: 0; padding-top: 0; }
 .ed-links.is-dragging { user-select: none; }
@@ -165,7 +165,7 @@
 .ed-sheet { position: fixed; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--color-paper); color: var(--color-ink); }
 .ed-sheet[open] { display: flex; flex-direction: column; animation: sheet-in var(--dur-long) var(--ease-out); }
 .ed-sheet::backdrop { background: var(--shade-35); }
-.ed-sheet__bar { display: flex; align-items: center; gap: var(--space-xs); padding: var(--space-xs) var(--space-xs) var(--space-xs) var(--space-md); border-bottom: 1px solid var(--color-rule); background: var(--glint); }
+.ed-sheet__bar { display: flex; align-items: center; gap: var(--space-xs); padding: var(--space-xs) var(--space-xs) var(--space-xs) var(--space-md); border-bottom: 1px solid var(--color-rule); background: var(--color-surface); }
 .ed-sheet__titles { flex: 1; min-width: 0; }
 .ed-sheet__title { font-size: var(--text-lg); }
 .ed-sheet__titles .ed-preview__note { text-align: left; font-size: var(--text-xs); }
