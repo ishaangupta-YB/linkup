@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dropIndex, insertAt, moveItem, needsProtocol, photoProblem, squareCrop } from './helpers'
+import { draftStatus, dropIndex, insertAt, moveItem, needsProtocol, photoProblem, squareCrop } from './helpers'
 
 describe('moveItem', () => {
   it('moves down and up', () => {
@@ -62,5 +62,19 @@ describe('needsProtocol', () => {
     expect(needsProtocol('https://example.com')).toBe(false)
     expect(needsProtocol('mailto:a@b.co')).toBe(false)
     expect(needsProtocol('  ')).toBe(false)
+  })
+})
+
+describe('draftStatus', () => {
+  it('says nothing when the live page matches the draft', () => {
+    expect(draftStatus(true, false, 'saved')).toBeNull()
+    expect(draftStatus(true, false, 'saving')).toBeNull()
+  })
+  it('names what the draft is waiting on', () => {
+    expect(draftStatus(false, true, 'saved')?.short).toBe('Not published')
+    expect(draftStatus(true, true, 'saving')?.short).toBe('Changes not live')
+  })
+  it('puts a failed save first', () => {
+    expect(draftStatus(true, true, 'error')).toEqual({ tone: 'error', short: 'Not saved yet' })
   })
 })

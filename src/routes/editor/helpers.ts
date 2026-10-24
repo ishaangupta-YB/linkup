@@ -1,3 +1,4 @@
+import type { SaveStatus } from '../../lib/page'
 import { hasProtocol } from '../../lib/url'
 
 /** A copy of the list with the item at `from` moved to `to` (both clamped). */
@@ -53,4 +54,12 @@ export function photoProblem(file: { type: string; size: number }): string | nul
 export function needsProtocol(url: string) {
   const trimmed = url.trim()
   return trimmed.length > 0 && !hasProtocol(trimmed)
+}
+
+/** The few words beside the phone Preview button: what the draft is waiting on, or null when the live page matches it. */
+export function draftStatus(published: boolean, unpublished: boolean, save: SaveStatus): { tone: 'error' | 'draft'; short: string } | null {
+  if (save === 'error') return { tone: 'error', short: 'Not saved yet' }
+  if (!published) return { tone: 'draft', short: 'Not published' }
+  if (unpublished) return { tone: 'draft', short: 'Changes not live' }
+  return null
 }

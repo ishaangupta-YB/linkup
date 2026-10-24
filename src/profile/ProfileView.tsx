@@ -44,7 +44,8 @@ export function ProfileView({ content, handle, mode, onLinkClick, onSocialClick,
 
         <header className="pv__head">
           {content.photo ? (
-            <img className="pv__photo" src={content.photo} alt="" width={112} height={112} />
+            // The hero image: sized up front so nothing shifts, never lazy, fetched first on the live page.
+            <img className="pv__photo" src={content.photo} alt="" width={112} height={112} decoding="async" fetchPriority={live ? 'high' : undefined} />
           ) : (
             <span className="pv__photo pv__photo--initials" aria-hidden="true">
               {initials(content.name, handle)}
@@ -74,7 +75,7 @@ export function ProfileView({ content, handle, mode, onLinkClick, onSocialClick,
                       className="pv-link"
                       href={href}
                       target="_blank"
-                  rel="noopener noreferrer"
+                      rel="noopener noreferrer"
                       onClick={live && onLinkClick ? () => onLinkClick(link, i) : undefined}
                     >
                       {inner}
@@ -171,9 +172,14 @@ function ShareButton({ handle, live, onShare }: { handle: string; live: boolean;
   }
 
   return (
-    <button type="button" className="pv__share" onClick={() => void share()} aria-live="polite">
-      <Icon name={copied ? 'check' : 'share'} size={16} />
-      <span>{copied ? 'Copied' : 'Share'}</span>
-    </button>
+    <>
+      <button type="button" className="pv__share" onClick={() => void share()}>
+        <Icon name={copied ? 'check' : 'share'} size={16} />
+        <span>{copied ? 'Copied' : 'Share'}</span>
+      </button>
+      <span className="visually-hidden" role="status">
+        {copied ? 'Page address copied.' : ''}
+      </span>
+    </>
   )
 }

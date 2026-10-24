@@ -3,6 +3,16 @@ import { socialHref } from '../../lib/url'
 import { TextField } from '../../ui/controls'
 import type { SectionProps } from './types'
 
+/** The phone keyboard each field wants: @ handles get the key with @ on it, addresses the URL keys, WhatsApp the number pad. */
+const INPUT_MODE: Record<SocialId, 'email' | 'url' | 'tel'> = {
+  instagram: 'email',
+  linkedin: 'url',
+  youtube: 'email',
+  whatsapp: 'tel',
+  x: 'email',
+  website: 'url',
+}
+
 function hint(id: SocialId, value: string) {
   if (!value.trim()) return 'Leave empty to hide this icon.'
   const href = socialHref(id, value)
@@ -10,12 +20,18 @@ function hint(id: SocialId, value: string) {
 }
 
 export function SocialSection({ draft, update }: SectionProps) {
+  const shown = SOCIALS.filter((s) => socialHref(s.id, draft.socials[s.id] ?? '')).length
   return (
-    <section className="ed-section surface" aria-labelledby="ed-social">
-      <h2 id="ed-social" className="ed-section__title">
-        Social icons
-      </h2>
-      <p className="ed-section__lede">Each filled field puts a small icon under your links.</p>
+    <section id="ed-sec-social" className="ed-section surface" aria-labelledby="ed-social">
+      <div className="ed-section__head">
+        <h2 id="ed-social" className="ed-section__title" tabIndex={-1}>
+          Social icons
+        </h2>
+        <span className="ed-section__count mono">
+          {shown} of {SOCIALS.length}
+        </span>
+      </div>
+      <p className="ed-section__lede">{shown ? 'Each filled field puts a small icon under your links.' : 'No icons yet. Fill any field below and its icon appears under your links.'}</p>
       <div className="ed-socials">
         {SOCIALS.map((s) => {
           const value = draft.socials[s.id] ?? ''
@@ -29,7 +45,8 @@ export function SocialSection({ draft, update }: SectionProps) {
               autoComplete="off"
               autoCapitalize="none"
               spellCheck={false}
-              inputMode={s.id === 'whatsapp' ? 'tel' : 'url'}
+              inputMode={INPUT_MODE[s.id]}
+              enterKeyHint="next"
               hint={text}
               error={text === null ? 'Add the full number with its country code, like 919800000000.' : null}
               onChange={(e) => {

@@ -6,8 +6,10 @@ import { Button, Skeleton } from '../../ui/controls'
 import { useMediaQuery, useTitle } from '../../ui/hooks'
 import { LinksSection } from './LinksSection'
 import { LookSection } from './LookSection'
+import { draftStatus } from './helpers'
 import { PreviewPane, PreviewSheet } from './Preview'
 import { ProfileSection } from './ProfileSection'
+import { SectionJump } from './SectionJump'
 import { SocialSection } from './SocialSection'
 import './editor.css'
 
@@ -29,40 +31,48 @@ export default function EditorPage() {
 
   const meta = { pageId: page.id, handle: page.handle }
   const section = { draft: page.draft, update: my.updateDraft, meta }
+  const status = draftStatus(!!page.published, my.hasUnpublishedChanges, my.saveStatus)
 
   return (
-    <div className="editor">
-      <div className="editor__panels">
-        <header className="editor__head">
-          <h1 className="editor__title">Your page</h1>
-          <p className="editor__lede">
-            Changes save as you type. Publish to show them at <span className="mono">{pageAddress(page.handle)}</span>.
-          </p>
-        </header>
-        <ProfileSection {...section} />
-        <LinksSection {...section} />
-        <SocialSection {...section} />
-        <LookSection {...section} />
-      </div>
+    <>
+      {!wide && <SectionJump />}
+      <div className="editor">
+        <div className="editor__panels">
+          <header className="editor__head">
+            <h1 className="editor__title">Your page</h1>
+            <p className="editor__lede">
+              Changes save as you type. Publish to show them at <span className="mono">{pageAddress(page.handle)}</span>.
+            </p>
+          </header>
+          <ProfileSection {...section} />
+          <LinksSection {...section} />
+          <SocialSection {...section} />
+          <LookSection {...section} />
+        </div>
 
-      {wide ? (
-        <PreviewPane page={page} unpublished={my.hasUnpublishedChanges} />
-      ) : (
-        <>
-          <Button
-            className="editor__preview-btn"
-            icon="eye"
-            onClick={() => {
-              setSheetOpen(true)
-              track('preview_opened', { where: 'sheet' }, meta)
-            }}
-          >
-            Preview
-          </Button>
-          <PreviewSheet page={page} unpublished={my.hasUnpublishedChanges} open={sheetOpen} onClose={() => setSheetOpen(false)} />
-        </>
-      )}
-    </div>
+        {wide ? (
+          <PreviewPane page={page} unpublished={my.hasUnpublishedChanges} saveStatus={my.saveStatus} />
+        ) : (
+          <>
+            {/* Floats above the tab bar; hides while a text field has focus so it never covers what is being typed. */}
+            <div className={status ? `ed-dock ed-dock--${status.tone}` : 'ed-dock ed-dock--plain'}>
+              {status && <span className="ed-dock__status">{status.short}</span>}
+              <Button
+                className="ed-dock__btn"
+                icon="eye"
+                onClick={() => {
+                  setSheetOpen(true)
+                  track('preview_opened', { where: 'sheet' }, meta)
+                }}
+              >
+                Preview
+              </Button>
+            </div>
+            <PreviewSheet page={page} unpublished={my.hasUnpublishedChanges} saveStatus={my.saveStatus} open={sheetOpen} onClose={() => setSheetOpen(false)} />
+          </>
+        )}
+      </div>
+    </>
   )
 }
 

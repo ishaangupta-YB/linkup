@@ -1,5 +1,5 @@
 /* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
- * component: the public page renderer · signature: link buttons in pharmacy plastic (moulded key, clear band, pharmacy label) · states: links, no links, unsafe link · dose: white, green, night
+ * component: the public page renderer, 320px phones up, safe areas on the live page · signature: link buttons in pharmacy plastic (moulded key, clear band, pharmacy label) · states: links, no links, unsafe link · dose: white, green, night
  * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: H, one centred column by nature, so the plastic and the label do the work */
 
@@ -35,7 +35,14 @@
   width: 100%; max-width: 560px; margin-inline: auto;
   padding: clamp(16px, 4cqi, 40px) 16px clamp(24px, 5cqi, 48px);
 }
-.pv__bar { display: flex; justify-content: flex-end; width: 100%; min-height: 40px; }
+.pv__bar { display: flex; justify-content: flex-end; width: 100%; min-height: 44px; }
+/* The live page fills the phone: keep clear of notches, rounded corners and the home indicator (in-app browsers included). */
+.pv[data-mode="live"] .pv__col {
+  padding-top: calc(clamp(16px, 4cqi, 40px) + env(safe-area-inset-top));
+  padding-right: max(16px, env(safe-area-inset-right));
+  padding-bottom: calc(clamp(24px, 5cqi, 48px) + env(safe-area-inset-bottom));
+  padding-left: max(16px, env(safe-area-inset-left));
+}
 
 .pv__head { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; margin-top: 4px; text-align: center; }
 .pv__photo {
@@ -50,13 +57,14 @@
   box-shadow: inset 0 2px 0 var(--glint), inset 0 -16px 24px -16px var(--deep), 0 0 0 4px var(--pv-chip), 0 14px 28px -14px var(--shade-35);
 }
 .pv__name {
-  max-width: 100%; margin: 0; color: var(--pv-ink);
+  max-width: 100%; min-width: 0; margin: 0; color: var(--pv-ink); overflow-wrap: anywhere; text-wrap: balance;
   font: 700 clamp(1.625rem, 1.1rem + 2.4cqi, 2.375rem) / 1.08 var(--font-display); letter-spacing: var(--tracking-display);
 }
-.pv__tagline { max-width: 36ch; color: var(--pv-ink-2); font-size: 1.0625rem; font-weight: 500; }
-.pv__bio { max-width: 40ch; color: var(--pv-ink-2); font-size: 1rem; white-space: pre-line; }
-.pv__location { display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; color: var(--pv-muted); font-size: 0.9375rem; }
+.pv__tagline { max-width: min(36ch, 100%); color: var(--pv-ink-2); font-size: 1.0625rem; font-weight: 500; overflow-wrap: anywhere; text-wrap: balance; }
+.pv__bio { max-width: min(40ch, 100%); color: var(--pv-ink-2); font-size: 1rem; white-space: pre-line; overflow-wrap: anywhere; text-wrap: pretty; }
+.pv__location { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; margin-top: 2px; color: var(--pv-muted); font-size: 0.9375rem; }
 .pv__location svg { flex: none; }
+.pv__location span { min-width: 0; overflow-wrap: anywhere; }
 
 /* ---------- links ---------- */
 
@@ -103,10 +111,10 @@
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-rule) 80%, transparent), 0 10px 22px -14px var(--shade-35);
 }
 .pv[data-style="label"] .pv-link__body { flex: 1; padding: 12px 16px; }
-.pv[data-style="label"] .pv-link__title { font: 500 0.9375rem / 1.35 var(--font-outlier); text-wrap: pretty; }
+.pv[data-style="label"] .pv-link__title { font: 500 1rem / 1.35 var(--font-outlier); text-wrap: pretty; }
 .pv[data-style="label"] .pv-link__host {
   display: block; padding-top: 4px; border-top: 1px dashed var(--color-rule);
-  overflow: hidden; color: var(--color-muted); font: 400 0.8125rem / 1.3 var(--font-outlier); text-overflow: ellipsis; white-space: nowrap;
+  overflow: hidden; color: var(--color-muted); font: 400 0.875rem / 1.3 var(--font-outlier); text-overflow: ellipsis; white-space: nowrap;
 }
 .pv[data-style="label"] .pv-link__stub {
   position: relative; display: grid; place-items: center; align-self: stretch; flex: none; width: 56px;
@@ -123,6 +131,11 @@
 .pv[data-style="label"][data-shape="pill"] .pv-link__stub { width: 64px; padding-right: 8px; }
 .pv[data-style="label"][data-shape="pill"] .pv-link__stub::before, .pv[data-style="label"][data-shape="pill"] .pv-link__stub::after { display: none; }
 .pv[data-style="label"] a.pv-link:active { transform: translateY(1px); }
+/* 320px phones: a slimmer stub leaves the title room to wrap by words. */
+@container pv (max-width: 360px) {
+  .pv[data-style="label"] .pv-link__body { padding: 12px; }
+  .pv[data-style="label"] .pv-link__stub { width: 48px; }
+}
 
 @media (hover: hover) {
   .pv[data-style="moulded"] a.pv-link:hover { background: linear-gradient(color-mix(in oklab, var(--glint) 66%, transparent), transparent 70%), var(--t); }
@@ -146,10 +159,12 @@
 @media (hover: hover) {
   .pv__social:hover, .pv__share:hover { background: color-mix(in oklab, var(--pv-chip) 88%, var(--color-accent)); }
 }
+/* 44px on touch screens and whenever the page is phone-sized (the editor's phone preview shows the real size). */
 @media (pointer: coarse) { .pv__share { height: 44px; } }
+@container pv (max-width: 480px) { .pv__share { height: 44px; } }
 
 .pv__foot { margin-top: auto; padding-top: clamp(40px, 9cqi, 64px); }
-.pv__made { display: inline-flex; align-items: center; min-height: 32px; padding: 0 8px; border-radius: 6px; color: var(--pv-muted); font-size: 0.8125rem; text-decoration: none; }
+.pv__made { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; border-radius: 6px; color: var(--pv-muted); font-size: 0.8125rem; text-decoration: none; }
 .pv__made:hover { color: var(--pv-ink); text-decoration: underline; text-decoration-color: currentColor; }
 .pv__made:focus-visible { outline: 2px solid var(--pv-focus); outline-offset: 2px; }
 .pv__made:active { transform: translateY(1px); }

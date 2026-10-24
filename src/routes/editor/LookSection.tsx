@@ -44,8 +44,8 @@ export function LookSection({ draft, update, meta }: SectionProps) {
   }
 
   return (
-    <section className="ed-section surface" aria-labelledby="ed-look">
-      <h2 id="ed-look" className="ed-section__title">
+    <section id="ed-sec-look" className="ed-section surface" aria-labelledby="ed-look">
+      <h2 id="ed-look" className="ed-section__title" tabIndex={-1}>
         Look
       </h2>
 

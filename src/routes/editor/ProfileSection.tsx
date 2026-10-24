@@ -33,8 +33,8 @@ export function ProfileSection({ draft, update }: SectionProps) {
   }
 
   return (
-    <section className="ed-section surface" aria-labelledby="ed-profile">
-      <h2 id="ed-profile" className="ed-section__title">
+    <section id="ed-sec-profile" className="ed-section surface" aria-labelledby="ed-profile">
+      <h2 id="ed-profile" className="ed-section__title" tabIndex={-1}>
         Profile
       </h2>
 
