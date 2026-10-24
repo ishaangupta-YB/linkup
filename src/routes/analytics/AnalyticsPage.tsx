@@ -87,7 +87,12 @@ function Dashboard({ page }: { page: Page }) {
   const store = useEventStore()
   const [retry, setRetry] = useState(0)
   const compact = useMediaQuery('(max-width: 40rem)')
-  const links = page.draft.links
+  // Live links keep getting clicks after they leave the draft, so the rows cover both.
+  const links = useMemo(() => {
+    const draftIds = new Set(page.draft.links.map((l) => l.id))
+    const liveOnly = (page.published?.links ?? []).filter((l) => !draftIds.has(l.id))
+    return [...page.draft.links, ...liveOnly]
+  }, [page.draft.links, page.published])
   const handle = page.handle
   const pageId = page.id
 
@@ -106,7 +111,7 @@ function Dashboard({ page }: { page: Page }) {
     try {
       const real = store.events.filter((e) => e.stream === 'page' && e.pageId === pageId && !e.sample)
       const generated = sample
-        ? generateSampleEvents({ pageId, handle, links, socials: page.draft.socials, now: store.now, days: 90, seed: 7 })
+        ? generateSampleEvents({ pageId, handle, links, socials: page.draft.socials, now: store.now, days: 180, seed: 7 })
         : []
       const all = generated.length ? mergeByTime(generated, real) : real
       const result = aggregate(all, { pageId, from: bounds.from, to: bounds.to, prevFrom: bounds.prevFrom, prevTo: bounds.prevTo, links, bucket: bounds.bucket })

@@ -131,3 +131,14 @@ test('a stranger’s click reaches the owner’s dashboard with sample data off'
   await expect(page.getByRole('row', { name: /Partner with us/ }).getByRole('cell').first()).toHaveText('0')
   expect(errors).toEqual([])
 })
+
+test('an edit made just before a reload is kept', async ({ page }) => {
+  await page.goto('/signin')
+  await page.getByRole('button', { name: 'Use the demo account' }).click()
+  await expect(page).toHaveURL(/\/app\/editor$/)
+  const bio = page.getByRole('textbox', { name: 'Bio', exact: true })
+  await bio.fill('Typed a moment before reloading.')
+  await page.waitForTimeout(100)
+  await page.reload()
+  await expect(page.getByRole('textbox', { name: 'Bio', exact: true })).toHaveValue('Typed a moment before reloading.')
+})

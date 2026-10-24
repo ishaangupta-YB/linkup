@@ -75,7 +75,7 @@ export function LinksSection({ draft, update, meta }: SectionProps) {
       message: `Deleted “${nameOf(link)}”.`,
       action: {
         label: 'Undo',
-        run: () => setLinks((list) => (list.some((l) => l.id === link.id) ? list : insertAt(list, index, link))),
+        run: () => setLinks((list) => (list.some((l) => l.id === link.id) || list.length >= LIMITS.links ? list : insertAt(list, index, link))),
       },
     })
   }

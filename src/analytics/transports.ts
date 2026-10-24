@@ -1,4 +1,4 @@
-import { readJSON, writeJSON } from '../lib/storage'
+import { readJSON, removeMemoryCopy, writeJSON } from '../lib/storage'
 import type { AnalyticsEvent } from './events'
 
 /** Where batches of events go. `unloading` is set when the page is closing and only sendBeacon-style delivery survives. */
@@ -10,7 +10,7 @@ export interface Transport {
 /* ---------- local: the demo warehouse ---------- */
 
 export const LOCAL_EVENTS_KEY = 'linkup:events'
-/** Oldest events drop off past this, so localStorage never fills up. */
+/** Oldest events drop off past this many. When the browser's quota is hit first, the oldest quarter goes until the write fits. */
 export const LOCAL_EVENTS_CAP = 20_000
 const CHANNEL = 'linkup:events'
 
@@ -60,8 +60,16 @@ export class LocalTransport implements Transport {
   async send(events: AnalyticsEvent[]) {
     const stored = readLocalEvents()
     const seen = new Set(stored.map((e) => e.id))
-    const merged = stored.concat(events.filter((e) => !seen.has(e.id)))
-    writeJSON(LOCAL_EVENTS_KEY, merged.length > LOCAL_EVENTS_CAP ? merged.slice(-LOCAL_EVENTS_CAP) : merged)
+    let next = stored.concat(events.filter((e) => !seen.has(e.id)))
+    if (next.length > LOCAL_EVENTS_CAP) next = next.slice(-LOCAL_EVENTS_CAP)
+    while (!writeJSON(LOCAL_EVENTS_KEY, next)) {
+      // Out of quota: drop the oldest quarter and try again; give up (keeping the batch in the outbox) once only this batch is left.
+      if (next.length <= events.length) {
+        removeMemoryCopy(LOCAL_EVENTS_KEY)
+        throw new Error('Browser storage is full')
+      }
+      next = next.slice(Math.ceil(next.length / 4))
+    }
     notify(true)
   }
 }
@@ -100,7 +108,11 @@ export class HttpTransport implements Transport {
   }
 }
 
-/** Sends to every transport; fails only if all of them fail, so the local copy is never lost to a network error. */
+/**
+ * Sends to every transport and fails if any of them fails, so the tracker keeps the batch
+ * and retries it. Retries reach every transport again: the local store and the collector
+ * both dedupe on event id.
+ */
 export class FanoutTransport implements Transport {
   readonly name: string
   private transports: Transport[]
@@ -110,7 +122,7 @@ export class FanoutTransport implements Transport {
   }
   async send(events: AnalyticsEvent[], unloading: boolean) {
     const results = await Promise.allSettled(this.transports.map((t) => t.send(events, unloading)))
-    if (results.every((r) => r.status === 'rejected')) throw new Error('Every analytics transport failed')
+    if (results.some((r) => r.status === 'rejected')) throw new Error('An analytics transport failed')
   }
 }
 

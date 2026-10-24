@@ -31,11 +31,11 @@ App events: `signed_up`, `signed_in`, `signed_out`, `handle_claimed`, `editor_op
 - No tracking when the browser sends Do Not Track or Global Privacy Control (page events).
 - A per-browser opt-out in Settings stops all events and clears the unsent queue.
 - A page owner's own visits are not counted unless they turn on "Count my own visits".
-- No names, emails or IP addresses are put on events.
+- No visitor names, emails or IP addresses are put on events. Page events do carry the page's public content they refer to: the page name on `page_view`, and the link title and URL on `link_click`.
 
 ## How the client sends events
 
-`src/analytics/tracker.ts` queues events, sends visitor events at once and app events in batches of 10 or every 4 seconds, and flushes with `sendBeacon` when the tab is hidden or closed. Unsent events stay in an outbox in `localStorage` and are retried. Identical events with the same dedupe key within two seconds are sent once.
+`src/analytics/tracker.ts` queues events, sends visitor events at once and app events in batches of 10 or every 4 seconds, and flushes with `sendBeacon` when the tab is hidden or closed. Unsent events stay in an outbox in `localStorage` and are retried; with `both`, a batch is kept until every transport has accepted it, and both sides dedupe on `id`. If the browser's storage is full, the local store drops its oldest events to make room. Identical events with the same dedupe key within two seconds are sent once; a reload counts as a new view.
 
 Where they go is set at build time with Vite env variables (`src/analytics/transports.ts`):
 

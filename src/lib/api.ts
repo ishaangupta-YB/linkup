@@ -8,7 +8,7 @@ import avatar from '../assets/avatar.jpg'
 import { blankContent, DEMO_ACCOUNT, demoContent } from './defaults'
 import { handleProblem, normaliseHandle } from './handle'
 import { newId } from './ids'
-import { readJSON, removeKey, writeJSON } from './storage'
+import { readJSON, removeKey, removeMemoryCopy, writeJSON } from './storage'
 import { LIMITS, type Account, type AccountSettings, type Page, type PageContent, type PublicPage } from './types'
 
 export type ApiErrorCode =
@@ -66,7 +66,11 @@ function load(): Db {
 }
 
 function save(db: Db) {
-  if (!writeJSON(DB_KEY, db)) throw new ApiError('storage_full', 'This browser is out of storage space. Try a smaller photo.')
+  if (!writeJSON(DB_KEY, db)) {
+    // Keep reads in line with what is really stored, so a failed save looks failed everywhere.
+    removeMemoryCopy(DB_KEY)
+    throw new ApiError('storage_full', 'This browser is out of storage space. Try a smaller photo.')
+  }
 }
 
 function hydrate(content: PageContent): PageContent {
@@ -298,6 +302,12 @@ export async function getMyPage(): Promise<Page | null> {
 
 export async function saveDraft(content: PageContent): Promise<Page> {
   await wait()
+  return saveDraftSync(content)
+}
+
+/** The same save without the simulated network delay, for when the tab is closing and cannot wait. */
+export function saveDraftSync(content: PageContent): Page {
+  if (content.links.length > LIMITS.links) throw new ApiError('invalid_input', `A page holds ${LIMITS.links} links at most.`)
   const db = load()
   const page = requirePage(db, requireAccount(db).id)
   page.draft = dehydrate(content)

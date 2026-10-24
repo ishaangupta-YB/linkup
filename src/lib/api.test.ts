@@ -67,6 +67,8 @@ describe('handles and urls', () => {
     expect(handleProblem('.bad')).toMatch(/Start and end/)
     expect(handleProblem('a..b')).toMatch(/one dot/)
     expect(handleProblem('Caps')).toMatch(/lowercase/)
+    expect(handleProblem('favicon.svg')).toMatch(/file name/)
+    expect(handleProblem('asha.rao')).toBeNull()
   })
 
   it('validates and normalises urls', () => {

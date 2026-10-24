@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate, NavLink, Outlet } from 'react-router'
 import { useAuth } from '../lib/auth'
 import { MyPageProvider, useMyPage } from '../lib/page'
@@ -79,6 +79,21 @@ function TopBar() {
     }
   }
 
+  // Say why a save failed once, the first time it happens, rather than only in the status label.
+  const shownError = useRef<string | null>(null)
+  useEffect(() => {
+    if (my.saveError && my.saveError !== shownError.current) toast({ message: `Not saved: ${my.saveError}` })
+    shownError.current = my.saveError
+  }, [my.saveError, toast])
+
+  async function signOut() {
+    if (!(await my.flush())) {
+      toast({ message: 'Your latest changes are not saved yet.', action: { label: 'Sign out anyway', run: () => void auth.signOut() } })
+      return
+    }
+    await auth.signOut()
+  }
+
   async function copyAddress() {
     try {
       await navigator.clipboard.writeText(`https://${pageAddress(handle)}`)
@@ -105,7 +120,7 @@ function TopBar() {
         {page && (
           <>
             <span className="topbar__save" aria-live="polite">
-              {my.saveStatus === 'saving' ? 'Saving' : my.saveStatus === 'error' ? 'Not saved, retrying' : 'Saved'}
+              {my.saveStatus === 'saving' ? 'Saving' : my.saveStatus === 'error' ? 'Not saved' : 'Saved'}
             </span>
             <div className="topbar__address">
               <a className="topbar__addr-link mono" href={pagePath(handle)} target="_blank" rel="noreferrer" title={live ? 'Open your live page' : 'Your page is not published yet'}>
@@ -124,7 +139,7 @@ function TopBar() {
             </Button>
           </>
         )}
-        <IconButton icon="logout" label="Sign out" onClick={() => void auth.signOut()} />
+        <IconButton icon="logout" label="Sign out" onClick={() => void signOut()} />
       </div>
     </header>
   )

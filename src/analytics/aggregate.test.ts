@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { aggregate, describeChange, localDateKey, rangeBounds, type LinkRef } from './aggregate'
+import { aggregate, describeChange, localDateKey, rangeBounds, type LinkRef, addLocalDays } from './aggregate'
 import type { AnalyticsEvent, EventContext } from './events'
 
 const ctx: EventContext = {
@@ -140,7 +140,8 @@ describe('rangeBounds', () => {
     expect(localDateKey(b.from)).toBe('2026-10-18')
     expect(b.to).toBeGreaterThan(now)
     expect(localDateKey(b.prevFrom)).toBe('2026-10-11')
-    expect(b.prevTo).toBe(b.from)
+    expect(b.prevTo).toBe(addLocalDays(b.to, -7))
+    expect(b.prevTo).toBeGreaterThan(b.from - 86_400_000)
     expect(b.previousLabel).toBe('previous 7 days')
     const r = aggregate([], { pageId: 'p', from: b.from, to: b.to, links: [] })
     expect(r.series).toHaveLength(7)

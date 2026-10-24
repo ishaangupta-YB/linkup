@@ -50,7 +50,7 @@ export function isRangeKey(value: string | null): value is RangeKey {
 
 /**
  * The window a range covers, ending now. `7d` is today and the six local days before it;
- * the previous period is the same number of days just before. `today` runs from local
+ * the previous period is the same span shifted back that many days, ending at the same time of day. `today` runs from local
  * midnight to now and compares with the same hours yesterday.
  */
 export function rangeBounds(key: RangeKey, now: number): RangeBounds {
@@ -61,8 +61,8 @@ export function rangeBounds(key: RangeKey, now: number): RangeBounds {
   }
   const days = key === '7d' ? 7 : key === '30d' ? 30 : 90
   const from = addLocalDays(today, -(days - 1))
-  const prevFrom = addLocalDays(from, -days)
-  return { key, from, to, prevFrom, prevTo: from, bucket: 'day', previousLabel: `previous ${days} days` }
+  // The previous period ends at the same time of day, so a part-day today is not set against a full day.
+  return { key, from, to, prevFrom: addLocalDays(from, -days), prevTo: addLocalDays(to, -days), bucket: 'day', previousLabel: `previous ${days} days` }
 }
 
 export type LinkRef = { id: string; title: string; visible?: boolean }

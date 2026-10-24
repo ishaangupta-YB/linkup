@@ -7,6 +7,9 @@ export const RESERVED_HANDLES = new Set([
   'static', 'assets', 'support', 'terms', 'www', 'linkup', 'new', 'null', 'undefined',
 ])
 
+/** Endings the web server treats as files. */
+const FILE_LIKE = /\.(svg|png|jpe?g|gif|webp|avif|ico|txt|xml|json|webmanifest|html?|js|mjs|css|map|pdf|zip)$/
+
 export function normaliseHandle(input: string) {
   return input.trim().replace(/^@/, '').toLowerCase()
 }
@@ -19,5 +22,7 @@ export function handleProblem(handle: string): string | null {
   if (/^[._]|[._]$/.test(handle)) return 'Start and end with a letter or number.'
   if (/[._]{2}/.test(handle)) return 'Use one dot or underscore at a time.'
   if (RESERVED_HANDLES.has(handle)) return 'That address is used by LinkUp itself.'
+  // Addresses that look like files would be answered by the static file server instead of the page.
+  if (FILE_LIKE.test(handle)) return 'That address looks like a file name. Change the ending.'
   return null
 }

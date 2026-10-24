@@ -44,7 +44,7 @@ export default function PublicPage() {
   const page = state.status === 'ready' ? state.page : null
   useTitle(page ? `${page.content.name.trim() || `@${page.handle}`} - LinkUp` : state.status === 'missing' ? 'No page here - LinkUp' : 'LinkUp')
 
-  // One page view per load; the dedupe key keeps a remount or a quick reload from counting twice.
+  // One page view per load; the dedupe key keeps a remount (React's double effect in development) from counting twice. A reload is a new view.
   useEffect(() => {
     if (!page || isUncountedOwner(page.pageId)) return
     track('page_view', { title: page.content.name }, { pageId: page.pageId, handle: page.handle, dedupeKey: `pv:${page.pageId}` })

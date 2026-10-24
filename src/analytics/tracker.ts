@@ -44,6 +44,7 @@ export class Tracker {
   private recent = new Map<string, number>()
   private timer: ReturnType<typeof setInterval> | null = null
   private flushing: Promise<void> | null = null
+  private inFlight = new Set<string>()
 
   constructor(options: TrackerOptions) {
     this.transport = options.transport
@@ -125,9 +126,19 @@ export class Tracker {
 
   /** Sends everything queued. Concurrent calls share one send. */
   flush(unloading = false): Promise<void> {
-    if (this.flushing) return this.flushing
+    if (this.flushing) {
+      if (unloading) {
+        // The tab is closing: beacon whatever is not in the batch already on its way. Ids dedupe any overlap.
+        const rest = this.queue.filter((e) => !this.inFlight.has(e.id))
+        if (rest.length) this.transport.send(rest, true).catch(() => undefined)
+        return this.flushing
+      }
+      // Send whatever arrived during this flush once it finishes.
+      return this.flushing.then(() => this.flush())
+    }
     if (this.queue.length === 0) return Promise.resolve()
     const batch = this.queue.slice()
+    this.inFlight = new Set(batch.map((e) => e.id))
     this.flushing = this.transport
       .send(batch, unloading)
       .then(() => {
@@ -139,6 +150,7 @@ export class Tracker {
         // Keep the batch in the outbox; the next interval retries it.
       })
       .finally(() => {
+        this.inFlight = new Set()
         this.flushing = null
       })
     return this.flushing
