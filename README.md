@@ -6,6 +6,10 @@ The design system is the [Hallmark](https://github.com/Nutlope/hallmark) **Dose*
 
 **Demo stage.** There is no server yet. Accounts, pages and analytics events are stored in the browser's `localStorage` through an async demo API (`src/lib/api.ts`) that keeps the contract a real backend will keep. AWS comes later; see [docs/analytics.md](docs/analytics.md).
 
+## Deploy
+
+Vercel builds it as a Vite app (`vercel.json`): `npm run build` into `dist`, with every path rewritten to `index.html` so routes such as `/thedesignsquare` and `/app/editor` load on a fresh visit. Import the GitHub repo in Vercel, keep the defaults, and set the optional `VITE_ANALYTICS_*` variables from docs/analytics.md.
+
 ## Run
 
 ```sh
