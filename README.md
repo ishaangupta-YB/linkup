@@ -1,56 +1,56 @@
-# LinkUp · Page Editor
+# LinkUp
 
-A link-in-bio editor built from the [LinkUp Figma UI kit](https://www.figma.com/design/j3eNGI7yppUQvRP4L5ZdfB/LinkUp---Link-in-Bio-Editor---Profile-UI-Kit--Neon-Brand-System--%7C-The-design-Square--Community-?node-id=5-2943) (frame **02 · Page Editor**). It covers the desktop (≥1200px) and mobile layouts.
+A link-in-bio platform. A creator signs up, claims `linkup.to/<handle>`, builds a page (photo, name, tagline, bio, location, links, social icons, look), publishes it, and sees what visitors tap.
 
-## Stack
+The design system is the [Hallmark](https://github.com/Nutlope/hallmark) **Dose** theme: warm grained paper, tinted plastic, green-black ink, Schibsted Grotesk over Instrument Sans with DM Mono for addresses and times, and one pharmacy green for every signal.
 
-React 19, TypeScript, Vite, and plain CSS. The design tokens live in `src/index.css`.
+**Demo stage.** There is no server yet. Accounts, pages and analytics events are stored in the browser's `localStorage` through an async demo API (`src/lib/api.ts`) that keeps the contract a real backend will keep. AWS comes later; see [docs/analytics.md](docs/analytics.md).
 
 ## Run
 
 ```sh
 npm install
-npm run dev      # http://localhost:5173
+npm run dev          # http://localhost:5173
 npm run build
+npm test             # unit tests (vitest)
+npm run test:e2e     # Chromium end-to-end tests, desktop and Pixel 7 (Playwright)
+npm run lint
 ```
+
+Demo account: `demo@linkup.to` / `linkup-demo` (or "Use the demo account" on the sign-in screen). Its page is live at `/thedesignsquare`.
+
+## Routes
+
+| Path | Screen |
+| --- | --- |
+| `/` | Landing page |
+| `/signup`, `/signin` | Account screens |
+| `/onboarding` | Claim your page address |
+| `/app/editor` | Edit the page beside a live phone preview |
+| `/app/analytics` | Analytics for your page |
+| `/app/settings` | Account, password, address, publishing, analytics privacy, delete account |
+| `/:handle` | A published public page |
 
 ## What works
 
-- **Profile:** upload or remove the photo; Name, Tagline and Bio have live counters. Pressing Enter in Name sets where the two-tone headline breaks.
-- **Links (max 4):** drag the grip to reorder (arrow keys also work). The toggle hides a link without deleting it. The ⋯ menu has edit, duplicate and delete. Each link expands to edit inline. URLs are checked on blur, with a one-tap "Fix" that adds `https://`. Deleting asks for confirmation, then lets you undo for 5 s.
-- **Social icons:** an empty field hides that icon on the page.
-- **Look & feel:** 4 themes (Neon Night, Lime Lead, Full-bleed Lime, AI Blue), 3 button styles, 3 button shapes, and a Straight or Lean 8° headline.
-- **Live preview:** renders the same `PublicProfile` component as the real page, in a Mobile or Desktop frame. On mobile it shows a scaled-down peek card.
-- **Autosave:** saves to `localStorage` 600 ms after the last edit; the top bar shows "Saving…" then "All changes saved".
-- **Preview / Publish:** Preview opens a full-screen view with working links. Publish only shows a confirmation toast (there's no backend).
-
-## Analytics (`#analytics`)
-
-This tab shows how link analytics would look. It is **frontend-only and uses sample data**: `src/analytics/data.ts` generates 180 days of traffic from a fixed seed, so the numbers don't change between reloads. To use real data, replace `getAnalytics()` with an API call that returns the same shape.
-
-- **Date range** (7 / 30 / 90 days) applies to every number on the page.
-- **Stat tiles:** views, link clicks, click-through rate, and unique visitors, each with a trend sparkline and the change vs the previous period.
-- **Traffic chart:** daily views and clicks on one axis, with a crosshair tooltip you can also move with the arrow keys.
-- **Link performance** uses the links from the editor, so renaming, reordering or hiding a link shows up here.
-- **Also included:** traffic sources, devices, top locations, and social icon clicks.
-- Every chart has a **Table** view. The chart colors are slightly adjusted brand hues that passed color-blind and contrast checks on the dark background.
+- **Accounts:** sign up, sign in, sign out, change name, email and password, delete the account (which frees the address). Passwords are hashed with PBKDF2 in the browser; this is a demo, not real security.
+- **Address:** 3 to 30 characters (lowercase letters, numbers, dots, underscores), checked live; app paths such as `app` or `settings` are reserved.
+- **Editor:** photo upload (cropped and resized to 512 px), name, tagline, bio and location with counters; up to 8 links with drag or keyboard reorder, hide without deleting, duplicate, delete with undo, and URL checks with a one-tap `https://` fix; six social icons; three grounds, seven plastic tints, three button styles and three shapes. Edits autosave to a draft; **Publish** makes them live.
+- **Public page:** only published content is served. Links open in a new tab and only `http(s)`, `mailto` and `tel` links are rendered as links.
+- **Analytics:** page views, unique visitors, link clicks, click rate, sources (UTM tag or referrer), devices, browsers, countries (from the time zone), hours of day and social clicks, over today, 7, 30 or 90 days with the change against the previous period. Every chart has a table view. Export to CSV or JSON. Real events are recorded; "Include sample data" mixes in generated events (always labelled) so a new page is not empty. The owner's own visits are not counted unless they turn that on, and Do Not Track and Global Privacy Control are respected.
 
 ## Structure
 
 ```
 src/
-  store.tsx                 profile state, reducer, autosave
-  components/
-    ui.tsx / ui.css         Button, IconButton, PanelHeader, TextField, Toggle, Segmented, Chip
-    PublicProfile.tsx/.css  the public page (themes as CSS variables)
-    Section.tsx             desktop section / collapsible mobile card
-    ProfileSection, LinksSection, SocialSection, LookSection
-    Preview.tsx             live preview, mobile peek, full-screen overlay
-    Bars.tsx                Topbar + mobile BottomBar
-    Toast.tsx
-  analytics/
-    data.ts                 seeded sample data + formatters
-    charts.tsx              TrafficChart, BarList, SplitBar, Sparkline (hand-rolled SVG/CSS)
-    AnalyticsPage.tsx       the dashboard
-  assets/                   icons and images exported from Figma
+  lib/          types, demo API, auth and page providers, URL and handle rules
+  analytics/    event schema, tracker, transports (local, HTTP), aggregate, sample data, export
+  ui/           controls (Button, TextField, Toggle, Segmented, ...), Icon, Toast
+  styles/       Hallmark Dose tokens, base and shared control styles
+  shell/        the /app top bar and mobile tab bar
+  profile/      ProfileView, the public page renderer (also used in previews)
+  routes/       landing, auth, editor, analytics, settings, public
+e2e/            Playwright tests
+docs/           analytics.md
+.hallmark/      Hallmark build log
 ```
