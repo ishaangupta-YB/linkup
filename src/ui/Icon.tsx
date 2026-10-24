@@ -42,13 +42,14 @@ const PATHS = {
 
 export type IconName = keyof typeof PATHS
 
-export function Icon({ name, size = 20, ...rest }: { name: IconName; size?: number } & Omit<SVGProps<SVGSVGElement>, 'name'>) {
+/** `filled` fills the shape in currentColor as well as stroking it (a selected state, a solid glyph). */
+export function Icon({ name, size = 20, filled = false, ...rest }: { name: IconName; size?: number; filled?: boolean } & Omit<SVGProps<SVGSVGElement>, 'name'>) {
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
+      fill={filled ? 'currentColor' : 'none'}
       stroke="currentColor"
       strokeWidth={1.75}
       strokeLinecap="round"

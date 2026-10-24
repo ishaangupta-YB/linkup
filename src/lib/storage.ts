@@ -41,3 +41,32 @@ export function removeKey(key: string) {
 export function removeMemoryCopy(key: string) {
   memory.delete(key)
 }
+
+/** The stored text for a key, unparsed, or null. Lets a caller keep a value it cannot parse. */
+export function readRaw(key: string): string | null {
+  const kept = memory.get(key)
+  if (kept != null) return kept
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Calls `listener` when another tab of this site changes one of `keys` (the storage event
+ * never fires in the tab that wrote). A cleared storage (`key` null) counts for every key.
+ * Returns the unsubscribe function.
+ */
+export function onOtherTabChange(keys: string[], listener: (key: string | null) => void): () => void {
+  if (typeof window === 'undefined') return () => {}
+  const onStorage = (e: StorageEvent) => {
+    if (e.key !== null && !keys.includes(e.key)) return
+    // The other tab's write supersedes any copy this tab kept after a refused write.
+    if (e.key === null) memory.clear()
+    else memory.delete(e.key)
+    listener(e.key)
+  }
+  window.addEventListener('storage', onStorage)
+  return () => window.removeEventListener('storage', onStorage)
+}

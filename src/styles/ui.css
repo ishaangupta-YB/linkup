@@ -1,7 +1,8 @@
 /* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
  * nav: top bar, wordmark, three tabs, page address and publish · signature: the live page on a plastic tray beside the editor · states: loading, empty, error, full · dose: white
  * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, the controls carry the plastic so panels stay plain white */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, the controls carry the plastic so panels stay plain white
+ * touch: 44px hit targets and 16px inputs on coarse pointers, hover only where hover exists, toasts clear the tab bar and the safe area */
 @import url("./tokens.css");
 @import url("./base.css");
 
@@ -14,11 +15,11 @@
   border: 0; border-radius: var(--radius-input);
   background: linear-gradient(var(--glint), var(--color-paper));
   color: var(--color-ink); font: 500 var(--text-md) / 1 var(--font-body);
-  text-decoration: none; white-space: nowrap; cursor: pointer;
+  text-decoration: none; white-space: nowrap; cursor: pointer; touch-action: manipulation;
   box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 3px 0 var(--color-rule), 0 6px 14px -8px var(--shade-35);
   transition: transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
 }
-.btn:hover { background: linear-gradient(var(--glint), var(--color-paper-2)); }
+@media (hover: hover) { .btn:hover { background: linear-gradient(var(--glint), var(--color-paper-2)); } }
 .btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
 .btn:active { transform: translateY(3px); box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 0 0 var(--color-rule); }
 .btn:disabled, .btn[aria-disabled="true"] { cursor: not-allowed; opacity: 0.55; transform: none; }
@@ -27,10 +28,10 @@
   background: linear-gradient(var(--color-accent), var(--color-accent-deep)); color: var(--color-accent-ink);
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--glint) 35%, transparent), 0 0 0 1px var(--color-accent-deep), 0 3px 0 var(--color-accent-deep), 0 8px 18px -10px var(--color-accent-deep);
 }
-.btn--primary:hover { background: linear-gradient(color-mix(in oklab, var(--color-accent) 88%, var(--glint)), var(--color-accent)); }
+@media (hover: hover) { .btn--primary:hover { background: linear-gradient(color-mix(in oklab, var(--color-accent) 88%, var(--glint)), var(--color-accent)); } }
 .btn--primary:active { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--glint) 35%, transparent), 0 0 0 1px var(--color-accent-deep), 0 0 0 var(--color-accent-deep); }
 .btn--quiet { background: transparent; box-shadow: none; padding-inline: var(--space-sm); }
-.btn--quiet:hover { background: var(--color-paper-2); }
+@media (hover: hover) { .btn--quiet:hover { background: var(--color-paper-2); } }
 .btn--quiet:active { box-shadow: none; transform: translateY(1px); }
 .btn--danger { color: var(--color-error); }
 .btn--sm { --btn-h: var(--control-h-sm, 40px); padding: 0 var(--space-md); font-size: var(--text-sm); border-radius: 8px; }
@@ -45,16 +46,18 @@
 
 .icon-btn {
   display: inline-grid; place-items: center; width: 40px; height: 40px; flex: none;
-  border: 0; border-radius: var(--radius-input); background: transparent; color: var(--color-ink-2); cursor: pointer;
+  border: 0; border-radius: var(--radius-input); background: transparent; color: var(--color-ink-2); cursor: pointer; touch-action: manipulation;
   transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
 }
 .icon-btn--sm { width: 32px; height: 32px; border-radius: 8px; }
-.icon-btn:hover { background: var(--color-paper-2); color: var(--color-ink); }
+@media (hover: hover) { .icon-btn:hover { background: var(--color-paper-2); color: var(--color-ink); } }
 .icon-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
 .icon-btn:active { transform: translateY(1px); background: var(--color-paper-3); }
 .icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 /* 44px hit target on touch screens. */
 @media (pointer: coarse) { .icon-btn, .icon-btn--sm { width: 44px; height: 44px; } }
+/* App controls grow to the 44px touch height on touch screens; the desktop density stays. */
+@media (pointer: coarse) { .app-scope { --control-h: 44px; } }
 
 /* ---------- fields ---------- */
 
@@ -74,7 +77,9 @@
   transition: border-color var(--dur-micro) var(--ease-out);
 }
 .input::placeholder { color: color-mix(in oklab, var(--color-muted) 80%, var(--color-paper)); }
-.input:hover { border-color: var(--color-ink-2); }
+@media (hover: hover) { .input:hover { border-color: var(--color-ink-2); } }
+/* Under 16px, iOS zooms the page when a field takes focus. */
+@media (pointer: coarse) { .input { font-size: max(16px, var(--text-md)); } }
 .input:focus-visible { outline: none; border-color: var(--color-focus); box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-focus) 25%, transparent); }
 .input:disabled { background: var(--color-paper-2); color: var(--color-muted); cursor: not-allowed; }
 .input[aria-invalid="true"] { border-color: var(--color-error); }
@@ -89,8 +94,10 @@
 
 /* ---------- toggle ---------- */
 
-.toggle { position: relative; display: inline-flex; align-items: center; gap: var(--space-xs); cursor: pointer; min-height: 44px; }
-.toggle__input { position: absolute; opacity: 0; width: 44px; height: 28px; margin: 0; cursor: pointer; }
+.toggle { position: relative; display: inline-flex; align-items: center; gap: var(--space-xs); cursor: pointer; min-height: 44px; min-width: 44px; touch-action: manipulation; }
+/* The label is the hit target. The native switch stays in the tree for the keyboard and screen readers,
+ * shrunk to a corner so a click on the track or the text reaches the label, not the input. */
+.toggle__input { position: absolute; left: 0; top: 0; z-index: 1; width: 1px; height: 1px; opacity: 0; margin: 0; }
 .toggle__track {
   position: relative; width: 44px; height: 26px; flex: none; border-radius: var(--radius-pill);
   background: var(--color-rule); box-shadow: inset 0 1px 2px var(--shade-25);
@@ -103,30 +110,38 @@
 }
 .toggle__input:checked + .toggle__track { background: var(--color-accent); }
 .toggle__input:checked + .toggle__track .toggle__thumb { transform: translateX(18px); }
-.toggle:hover .toggle__track { background: color-mix(in oklab, var(--color-rule) 80%, var(--color-ink)); }
-.toggle:hover .toggle__input:checked + .toggle__track { background: var(--color-accent-deep); }
+@media (hover: hover) {
+  .toggle:hover .toggle__track { background: color-mix(in oklab, var(--color-rule) 80%, var(--color-ink)); }
+  .toggle:hover .toggle__input:checked + .toggle__track { background: var(--color-accent-deep); }
+}
 .toggle__input:focus-visible + .toggle__track { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-.toggle__input:active + .toggle__track .toggle__thumb { width: 22px; }
-.toggle__input:disabled + .toggle__track { opacity: 0.5; cursor: not-allowed; }
+.toggle:active .toggle__track .toggle__thumb { transform: scaleX(1.1); }
+.toggle:active .toggle__input:checked + .toggle__track .toggle__thumb { transform: translateX(18px) scaleX(1.1); }
+.toggle__input:disabled + .toggle__track { opacity: 0.55; cursor: not-allowed; }
+.toggle:has(.toggle__input:disabled) { cursor: not-allowed; }
 .toggle__text { font-size: var(--text-sm); }
 
 /* ---------- segmented: plastic keys, mint when checked ---------- */
 
 .segmented { display: inline-flex; flex-wrap: wrap; gap: var(--space-2xs); padding: var(--space-2xs); border-radius: 12px; background: var(--color-paper-2); box-shadow: inset 0 1px 2px var(--shade-12); }
-.segmented__option { position: relative; display: inline-flex; }
-.segmented__option input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.segmented__option { position: relative; display: inline-flex; cursor: pointer; touch-action: manipulation; }
+/* The label is the hit target: a click on its text reaches the label, not an overlaid input. The radio stays in
+ * the tree for arrow keys and screen readers, shrunk to a corner (still clickable there, so a test can check it). */
+.segmented__option input { position: absolute; left: 0; top: 0; z-index: 1; width: 1px; height: 1px; opacity: 0; margin: 0; }
+.segmented__option:has(input:disabled) { cursor: not-allowed; }
 .segmented__option > span {
   display: inline-flex; align-items: center; gap: var(--space-2xs); min-height: 36px; padding: 0 var(--space-sm);
   border-radius: 8px; color: var(--color-ink-2); font-size: var(--text-sm); font-weight: 500;
   transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
 }
-.segmented__option:hover > span { color: var(--color-ink); background: color-mix(in oklab, var(--glint) 60%, transparent); }
+@media (hover: hover) { .segmented__option:hover > span { color: var(--color-ink); background: color-mix(in oklab, var(--glint) 60%, transparent); } }
 .segmented__option input:checked + span { background: var(--color-accent-soft); color: var(--color-ink); box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px color-mix(in oklab, var(--color-accent) 35%, transparent), 0 2px 0 color-mix(in oklab, var(--color-accent) 35%, transparent); }
 .segmented__option input:focus-visible + span { outline: 2px solid var(--color-focus); outline-offset: 1px; }
-.segmented__option input:active + span { transform: translateY(1px); }
+.segmented__option:active > span { transform: translateY(1px); }
 .segmented__option input:disabled + span { background: var(--color-paper-2); color: var(--color-muted); cursor: not-allowed; box-shadow: none; }
 .segmented--sm .segmented__option > span { min-height: 30px; padding: 0 var(--space-xs); font-size: var(--text-xs); }
-@media (pointer: coarse) { .segmented__option > span, .segmented--sm .segmented__option > span { min-height: 44px; } }
+/* 44px keys on touch screens and on any narrow screen. */
+@media (pointer: coarse), (max-width: 60rem) { .segmented__option > span, .segmented--sm .segmented__option > span { min-height: 44px; } }
 
 /* ---------- surfaces ---------- */
 
@@ -142,7 +157,7 @@
 .skeleton { display: block; border-radius: 8px; background: linear-gradient(90deg, var(--color-paper-2), var(--color-paper-3), var(--color-paper-2)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
-.route-loading { min-height: 50vh; }
+.route-loading { min-height: 50dvh; }
 
 /* ---------- wordmark ---------- */
 
@@ -157,13 +172,20 @@
 
 /* ---------- toast ---------- */
 
-.toasts { position: fixed; z-index: var(--z-toast); left: 50%; bottom: var(--space-lg); transform: translateX(-50%); display: grid; gap: var(--space-xs); width: min(440px, calc(100% - 32px)); pointer-events: none; }
+/* --toast-offset is set by a screen with a bar along the bottom (the app's tab bar) so toasts sit above it. */
+.toasts {
+  position: fixed; z-index: var(--z-toast); left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--toast-offset, 0px) + var(--space-lg) + env(safe-area-inset-bottom));
+  display: grid; gap: var(--space-xs); width: min(440px, calc(100% - 32px)); pointer-events: none;
+}
+@media (max-width: 40rem) { .toasts { bottom: calc(var(--toast-offset, 0px) + var(--space-sm) + env(safe-area-inset-bottom)); } }
 .toast {
   display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
   border-radius: 12px; background: var(--color-ink); color: var(--color-paper); box-shadow: var(--shadow-lift); pointer-events: auto;
   animation: toast-in var(--dur-short) var(--ease-out);
 }
 .toast__icon { color: var(--color-accent-soft); flex: none; }
+.toast--error .toast__icon { color: var(--color-paper); }
 .toast__text { flex: 1; font-size: var(--text-sm); }
 .toast__action { border: 0; background: transparent; color: var(--color-accent-soft); font: 500 var(--text-sm) var(--font-body); padding: var(--space-xs); min-height: 36px; border-radius: 6px; cursor: pointer; text-decoration: underline; text-underline-offset: 0.2em; }
 .toast__action:hover { color: var(--color-paper); }
@@ -171,6 +193,7 @@
 .toast__action:active, .toast__close:active { transform: translateY(1px); }
 .toast__close { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 6px; background: transparent; color: color-mix(in oklab, var(--color-paper) 70%, transparent); cursor: pointer; }
 .toast__close:hover { color: var(--color-paper); background: color-mix(in oklab, var(--color-paper) 12%, transparent); }
+@media (pointer: coarse) { .toast__close { width: 44px; height: 44px; } .toast__action { min-height: 44px; } }
 @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
 
 /* ---------- the paper grain, shared by every ground ---------- */

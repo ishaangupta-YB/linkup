@@ -14,6 +14,8 @@ export default defineConfig({
   projects: [
     { name: 'desktop-chrome', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chrome', use: { ...devices['Pixel 7'] } },
+    // A small Android phone: the narrowest layout the app supports one-handed.
+    { name: 'small-android', use: { ...devices['Pixel 7'], viewport: { width: 360, height: 740 } } },
   ],
   webServer: {
     command: `npm run build && npx vite preview --port ${PORT} --strictPort`,

@@ -54,7 +54,13 @@ export type Page = {
   /** What /:handle serves. Null until the first publish. */
   published: PageContent | null
   publishedAt: number | null
+  /** When anything about the page last changed (draft, address). */
   updatedAt: number
+  /**
+   * When the draft last changed; strictly increasing per page. A save names the value it was
+   * based on, so an edit made in another tab is never silently overwritten. Always set by the API.
+   */
+  draftUpdatedAt?: number
 }
 
 export type Account = {
@@ -88,6 +94,10 @@ export const LIMITS = {
   handleMin: 3,
   handleMax: 30,
   passwordMin: 8,
+  passwordMax: 256,
+  email: 254,
+  /** Largest stored photo, decoded. The editor's 512 px JPEG is far smaller. */
+  photoBytes: 400 * 1024,
 }
 
 export const SITE_HOST = 'linkup.to'
