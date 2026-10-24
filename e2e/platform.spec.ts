@@ -43,20 +43,19 @@ test('a new creator signs up, builds a page, publishes it and sees a visit count
   await page.getByRole('button', { name: 'Make my account' }).click()
 
   await expect(page).toHaveURL(/\/onboarding$/)
-  const address = page.getByLabel('Page address')
+  const address = page.getByRole('textbox', { name: 'Page address' })
   await address.fill(handle)
-  await expect(page.getByText(/is free|available/i).first()).toBeVisible()
+  await expect(page.getByText(`linkup.to/${handle} is free.`)).toBeVisible()
   await page.getByRole('button', { name: 'Claim this address' }).click()
 
   await expect(page).toHaveURL(/\/app\/editor$/)
   await expect(page.getByRole('heading', { name: 'Your page' })).toBeVisible()
 
-  await page.getByLabel('Title').first().fill('My portfolio')
-  await page.getByLabel('Address').first().fill('example.com/portfolio')
-  await page.getByLabel('Address').first().blur()
-  await expect(page.getByRole('banner').getByText('Saved')).toBeVisible({ timeout: 5_000 }).catch(() => {
-    // The save status is hidden in the compact top bar; autosave still runs.
-  })
+  const title = page.getByRole('textbox', { name: 'Title', exact: true }).first()
+  const url = page.getByRole('textbox', { name: 'Address', exact: true }).first()
+  await title.fill('My portfolio')
+  await url.fill('example.com/portfolio')
+  await url.blur()
 
   await page.getByRole('button', { name: 'Publish', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Published' })).toBeVisible()
@@ -84,7 +83,7 @@ test('a new creator signs up, builds a page, publishes it and sees a visit count
   const popup = await popupPromise
   await popup.close()
 
-  await expect.poll(async () => (await storedEvents(visitor)).filter((e) => e.handle === handle).map((e) => e.name).sort()).toEqual(['link_click', 'page_view'])
+  await expect.poll(async () => (await storedEvents(visitor)).filter((e) => e.stream === 'page' && e.handle === handle).map((e) => e.name).sort()).toEqual(['link_click', 'page_view'])
   const view = (await storedEvents(visitor)).find((e) => e.name === 'page_view' && e.handle === handle)!
   expect((view as unknown as { context: { source: string } }).context.source).toBe('Instagram')
   expect(view.sample).toBeUndefined()
@@ -112,4 +111,23 @@ test('unknown addresses show a calm missing page', async ({ page }) => {
   await expect(page.getByText(/No page at linkup\.to\/nobody-here-at-all/)).toBeVisible()
   await page.goto('/app/editor')
   await expect(page).toHaveURL(/\/signin$/)
+})
+
+test('a stranger’s click reaches the owner’s dashboard with sample data off', async ({ page }) => {
+  const errors = watchErrors(page)
+  await page.goto('/thedesignsquare')
+  await expect(page.getByRole('heading', { name: 'The Design Square' })).toBeVisible()
+  const popupPromise = page.waitForEvent('popup')
+  await page.getByRole('link', { name: /Join the next Square/ }).click()
+  await (await popupPromise).close()
+  await expect.poll(async () => (await storedEvents(page)).filter((e) => e.stream === 'page').length).toBe(2)
+
+  await page.goto('/signin')
+  await page.getByRole('button', { name: 'Use the demo account' }).click()
+  await expect(page).toHaveURL(/\/app\/editor$/)
+  await page.goto('/app/analytics?range=7d&sample=off')
+  const row = page.getByRole('row', { name: /Join the next Square/ })
+  await expect(row.getByRole('cell').first()).toHaveText('1')
+  await expect(page.getByRole('row', { name: /Partner with us/ }).getByRole('cell').first()).toHaveText('0')
+  expect(errors).toEqual([])
 })
