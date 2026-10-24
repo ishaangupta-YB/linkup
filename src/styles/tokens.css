@@ -24,10 +24,16 @@
   --shadow-lift: 0 1px 1px oklch(30% 0.03 165 / 0.10), 8px 18px 28px -14px oklch(36% 0.06 165 / 0.32), 18px 40px 60px -30px oklch(40% 0.08 165 / 0.30);
   --tracking-display: -0.03em; --display-weight: 700;
   --shade-12: oklch(30% 0.03 165 / 0.12); --shade-25: oklch(30% 0.03 165 / 0.25); --shade-35: oklch(30% 0.03 165 / 0.35);
+  --chart-1: oklch(50% 0.13 160); --chart-2: oklch(37% 0.024 168); --chart-fill: oklch(50% 0.13 160 / 0.1); --chart-track: oklch(94.5% 0.018 150);
 }
 /* App screens (editor, analytics, settings, auth) run the fixed app scale, ratio 1.2. */
 .app-scope {
   --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.2rem; --text-xl: 1.44rem; --text-2xl: 1.728rem; --text-3xl: 2.074rem;
   --text-display-s: 1.44rem; --text-display: 1.728rem; --text-section: 1.2rem; --text-title: 1rem; --text-lead: 1rem;
   --control-h: 40px; --control-h-sm: 32px;
+}
+/* Public page grounds (dose.md): drenched pharmacy green under white ink, and night. */
+:root {
+  --ground-green: oklch(46% 0.12 160); --ground-green-deep: oklch(38% 0.1 162);
+  --ground-night: oklch(13% 0.01 170); --ground-night-2: oklch(20% 0.012 170); --ground-night-rule: oklch(32% 0.015 170); --ink-night: oklch(96% 0.01 160); --muted-night: oklch(74% 0.02 165);
 }

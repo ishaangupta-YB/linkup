@@ -45,7 +45,8 @@ export function socialHref(id: SocialId, value: string): string | null {
   const v = value.trim()
   if (!v) return null
   const handle = v.replace(/^@/, '')
-  const isUrl = hasProtocol(v) || /^[\w-]+(\.[\w-]+)+\//.test(v) || /\.(com|in|me|to|io|co|org|net)\b/i.test(v)
+  // A leading @ always means a handle, even when it contains a dot (@studio.in).
+  const isUrl = !v.startsWith('@') && (hasProtocol(v) || /^[\w-]+(\.[\w-]+)+\//.test(v) || /\.(com|in|me|to|io|co|org|net)\b/i.test(v))
   switch (id) {
     case 'instagram':
       return isUrl ? toHref(v) : `https://instagram.com/${handle}`

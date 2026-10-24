@@ -1,0 +1,161 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Dose (by request)
+ * component: the public page renderer · signature: link buttons in pharmacy plastic (moulded key, clear band, pharmacy label) · states: links, no links, unsafe link · dose: white, green, night
+ * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: H, one centred column by nature, so the plastic and the label do the work */
+
+/* Everything is scoped under .pv and themed per ground, so it reads the same full screen, in a phone frame and on the landing page. */
+.pv {
+  --pv-bg: var(--color-paper); --pv-ink: var(--color-ink); --pv-ink-2: var(--color-ink-2); --pv-muted: var(--color-muted);
+  --pv-rule: var(--color-rule); --pv-focus: var(--color-focus); --pv-chip: var(--glint); --pv-chip-ink: var(--color-ink);
+  --pv-clear-mix: 62%; --pv-clear-ink: var(--color-ink);
+  --pv-r: 12px;
+  container: pv / inline-size;
+  position: relative; min-height: 100%; width: 100%;
+  background-color: var(--pv-bg); color: var(--pv-ink);
+  font-family: var(--font-body); line-height: 1.5;
+}
+.pv[data-mode="live"] { min-height: 100dvh; }
+.pv[data-ground="green"] {
+  --pv-bg: var(--ground-green); --pv-ink: var(--glint); --pv-ink-2: color-mix(in oklab, var(--glint) 90%, var(--ground-green));
+  --pv-muted: color-mix(in oklab, var(--glint) 80%, var(--ground-green)); --pv-rule: color-mix(in oklab, var(--glint) 30%, transparent);
+  --pv-focus: var(--glint); --pv-chip: var(--glint); --pv-chip-ink: var(--color-ink);
+}
+.pv[data-ground="night"] {
+  --pv-bg: var(--ground-night); --pv-ink: var(--ink-night); --pv-ink-2: var(--ink-night); --pv-muted: var(--muted-night);
+  --pv-rule: var(--ground-night-rule); --pv-focus: var(--color-accent-soft); --pv-chip: var(--ground-night-2); --pv-chip-ink: var(--ink-night);
+  --pv-clear-mix: 40%; --pv-clear-ink: var(--ink-night);
+}
+.pv[data-shape="pill"] { --pv-r: var(--radius-pill); }
+.pv[data-shape="square"] { --pv-r: 4px; }
+
+.pv ::selection { background: color-mix(in oklab, var(--color-accent-soft) 70%, transparent); color: var(--color-ink); }
+
+.pv__col {
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%; max-width: 560px; margin-inline: auto;
+  padding: clamp(16px, 4cqi, 40px) 16px clamp(24px, 5cqi, 48px);
+}
+.pv__bar { display: flex; justify-content: flex-end; width: 100%; min-height: 40px; }
+
+.pv__head { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; margin-top: 4px; text-align: center; }
+.pv__photo {
+  width: clamp(96px, 20cqi, 128px); height: auto; aspect-ratio: 1; margin-bottom: 8px; border-radius: 50%; object-fit: cover;
+  box-shadow: 0 0 0 4px var(--pv-chip), 0 14px 28px -14px var(--shade-35);
+}
+.pv__photo--initials {
+  --deep: color-mix(in oklab, var(--t) 70%, var(--color-ink));
+  display: grid; place-items: center;
+  background: linear-gradient(color-mix(in oklab, var(--glint) 50%, transparent), transparent 60%), var(--t);
+  color: var(--color-ink); font: 700 clamp(2rem, 1.4rem + 3cqi, 2.75rem) / 1 var(--font-display); letter-spacing: var(--tracking-display);
+  box-shadow: inset 0 2px 0 var(--glint), inset 0 -16px 24px -16px var(--deep), 0 0 0 4px var(--pv-chip), 0 14px 28px -14px var(--shade-35);
+}
+.pv__name {
+  max-width: 100%; margin: 0; color: var(--pv-ink);
+  font: 700 clamp(1.625rem, 1.1rem + 2.4cqi, 2.375rem) / 1.08 var(--font-display); letter-spacing: var(--tracking-display);
+}
+.pv__tagline { max-width: 36ch; color: var(--pv-ink-2); font-size: 1.0625rem; font-weight: 500; }
+.pv__bio { max-width: 40ch; color: var(--pv-ink-2); font-size: 1rem; white-space: pre-line; }
+.pv__location { display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; color: var(--pv-muted); font-size: 0.9375rem; }
+.pv__location svg { flex: none; }
+
+/* ---------- links ---------- */
+
+.pv__links { display: grid; gap: 16px; width: 100%; margin: clamp(24px, 5cqi, 36px) 0 0; padding: 0; list-style: none; }
+.pv__empty { margin-top: 32px; padding: 20px 0; color: var(--pv-muted); font-size: 0.9375rem; text-align: center; }
+
+.pv-link {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 100%; min-height: 56px; padding: 12px 20px; border-radius: var(--pv-r);
+  color: var(--color-ink); font: 500 1rem / 1.3 var(--font-body); text-align: center; text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
+}
+.pv-link:focus-visible { outline: 2px solid var(--pv-focus); outline-offset: 3px; }
+.pv-link__body { display: grid; gap: 2px; min-width: 0; }
+.pv-link__title { overflow-wrap: anywhere; text-wrap: balance; }
+.pv-link__host, .pv-link__stub { display: none; }
+.pv-link--off { cursor: not-allowed; opacity: 0.7; }
+
+/* Moulded: a tinted plastic key with a glint on top and a 3px foot; it sinks on press. */
+.pv[data-style="moulded"] .pv-link {
+  --deep: color-mix(in oklab, var(--t) 68%, var(--color-ink));
+  background: linear-gradient(color-mix(in oklab, var(--glint) 46%, transparent), transparent 55%), var(--t);
+  box-shadow: inset 0 1.5px 0 var(--glint), inset 0 -12px 18px -14px var(--deep), 0 0 0 1px color-mix(in oklab, var(--t) 78%, var(--color-ink)), 0 3px 0 var(--deep), 0 12px 20px -12px var(--deep);
+}
+.pv[data-style="moulded"] a.pv-link:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1.5px 0 var(--glint), inset 0 -12px 18px -14px var(--deep), 0 0 0 1px color-mix(in oklab, var(--t) 78%, var(--color-ink)), 0 0 0 var(--deep), 0 4px 8px -6px var(--deep);
+}
+
+/* Clear: a translucent plastic band with a rim; the ground shows through. */
+.pv[data-style="clear"] .pv-link {
+  background: linear-gradient(color-mix(in oklab, var(--glint) 30%, transparent), transparent 24%), color-mix(in oklab, var(--t) var(--pv-clear-mix), transparent);
+  color: var(--pv-clear-ink);
+  box-shadow: inset 0 1.5px 0 color-mix(in oklab, var(--glint) 85%, transparent), inset 0 0 0 1px color-mix(in oklab, var(--t) 70%, var(--glint)), inset 0 -20px 28px -24px color-mix(in oklab, var(--t) 45%, var(--color-ink)), 0 14px 22px -18px color-mix(in oklab, var(--t) 80%, var(--color-ink));
+  backdrop-filter: blur(6px);
+}
+.pv[data-style="clear"] a.pv-link:active { transform: translateY(1px); }
+
+/* Label: a pharmacy label, grained white paper, a dashed rule, DM Mono, a tear-off stub. */
+.pv[data-style="label"] .pv-link {
+  justify-content: space-between; gap: 0; padding: 0; overflow: hidden;
+  background-color: var(--glint); text-align: left;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-rule) 80%, transparent), 0 10px 22px -14px var(--shade-35);
+}
+.pv[data-style="label"] .pv-link__body { flex: 1; padding: 12px 16px; }
+.pv[data-style="label"] .pv-link__title { font: 500 0.9375rem / 1.35 var(--font-outlier); text-wrap: pretty; }
+.pv[data-style="label"] .pv-link__host {
+  display: block; padding-top: 4px; border-top: 1px dashed var(--color-rule);
+  overflow: hidden; color: var(--color-muted); font: 400 0.8125rem / 1.3 var(--font-outlier); text-overflow: ellipsis; white-space: nowrap;
+}
+.pv[data-style="label"] .pv-link__stub {
+  position: relative; display: grid; place-items: center; align-self: stretch; flex: none; width: 56px;
+  border-left: 1.5px dashed color-mix(in oklab, var(--color-ink) 28%, transparent);
+  background: linear-gradient(color-mix(in oklab, var(--glint) 40%, transparent), transparent 60%), color-mix(in oklab, var(--t) 80%, var(--glint));
+  color: var(--color-ink-2); font: 500 0.875rem / 1 var(--font-outlier); font-variant-numeric: tabular-nums;
+}
+.pv[data-style="label"] .pv-link__stub::before, .pv[data-style="label"] .pv-link__stub::after {
+  content: ""; position: absolute; left: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--pv-bg);
+}
+.pv[data-style="label"] .pv-link__stub::before { top: -5px; }
+.pv[data-style="label"] .pv-link__stub::after { bottom: -5px; }
+.pv[data-style="label"][data-shape="pill"] .pv-link__body { padding-left: 24px; }
+.pv[data-style="label"][data-shape="pill"] .pv-link__stub { width: 64px; padding-right: 8px; }
+.pv[data-style="label"][data-shape="pill"] .pv-link__stub::before, .pv[data-style="label"][data-shape="pill"] .pv-link__stub::after { display: none; }
+.pv[data-style="label"] a.pv-link:active { transform: translateY(1px); }
+
+@media (hover: hover) {
+  .pv[data-style="moulded"] a.pv-link:hover { background: linear-gradient(color-mix(in oklab, var(--glint) 66%, transparent), transparent 70%), var(--t); }
+  .pv[data-style="clear"] a.pv-link:hover { background: linear-gradient(color-mix(in oklab, var(--glint) 40%, transparent), transparent 30%), color-mix(in oklab, var(--t) calc(var(--pv-clear-mix) + 14%), transparent); }
+  .pv[data-style="label"] a.pv-link:hover .pv-link__title { text-decoration: underline; text-decoration-color: var(--color-accent); text-underline-offset: 0.2em; }
+}
+
+/* ---------- socials, share, foot ---------- */
+
+.pv__socials { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 28px 0 0; padding: 0; list-style: none; }
+.pv__social, .pv__share {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; background: var(--pv-chip); color: var(--pv-chip-ink); text-decoration: none; cursor: pointer;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--glint) 60%, transparent), 0 0 0 1px color-mix(in oklab, var(--pv-rule) 70%, transparent), 0 2px 0 color-mix(in oklab, var(--pv-rule) 70%, transparent);
+  transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
+}
+.pv__social { width: 44px; height: 44px; border-radius: 50%; }
+.pv__share { height: 36px; padding: 0 16px 0 12px; border-radius: var(--radius-pill); font: 500 0.875rem / 1 var(--font-body); }
+.pv__social:focus-visible, .pv__share:focus-visible { outline: 2px solid var(--pv-focus); outline-offset: 2px; }
+.pv__social:active, .pv__share:active { transform: translateY(2px); }
+@media (hover: hover) {
+  .pv__social:hover, .pv__share:hover { background: color-mix(in oklab, var(--pv-chip) 88%, var(--color-accent)); }
+}
+@media (pointer: coarse) { .pv__share { height: 44px; } }
+
+.pv__foot { margin-top: auto; padding-top: clamp(40px, 9cqi, 64px); }
+.pv__made { display: inline-flex; align-items: center; min-height: 32px; padding: 0 8px; border-radius: 6px; color: var(--pv-muted); font-size: 0.8125rem; text-decoration: none; }
+.pv__made:hover { color: var(--pv-ink); text-decoration: underline; text-decoration-color: currentColor; }
+.pv__made:focus-visible { outline: 2px solid var(--pv-focus); outline-offset: 2px; }
+.pv__made:active { transform: translateY(1px); }
+.pv__col { min-height: inherit; }
+.pv__share:disabled { cursor: not-allowed; opacity: 0.55; }
+@media (prefers-reduced-motion: reduce) {
+  .pv-link, .pv__social, .pv__share { transition: background-color var(--dur-micro) linear; }
+  .pv a.pv-link:active, .pv__social:active, .pv__share:active { transform: none; }
+}

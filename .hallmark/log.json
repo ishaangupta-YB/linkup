@@ -1,0 +1,32 @@
+[
+ {
+  "shape": "Map / Diagram",
+  "theme": "dose",
+  "axes": "light/grotesk-sans/chromatic-green",
+  "hero": "Settled",
+  "nav": "edge-aligned",
+  "footer": "colophon block",
+  "imagery": "the product: real ProfileView in preview mode, hero phone and look tray; no photographs",
+  "photos": [],
+  "entry": "landing",
+  "fingerprint": "map-diagram/settled/edge-aligned/colophon/product/dose",
+  "sections": [
+   "Hero (phone on seven plastic compartments)",
+   "Map (bio to page to links to counted tap)",
+   "Rows (questions asked first)",
+   "Split tray (look controls, live phone)",
+   "Table (what a page counts)",
+   "Statement (own visits not counted)",
+   "Split close (address labels)",
+   "Footer (colophon)"
+  ],
+  "signature": "the real public page, scrollable, in a phone standing on Dose plastic",
+  "waived": [
+   "47b"
+  ],
+  "prompt": "LinkUp landing page, link-in-bio for creators in India, sign up",
+  "draw": "0e94bb",
+  "date": "2026-10-24",
+  "mode": "build"
+ }
+]

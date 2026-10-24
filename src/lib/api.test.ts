@@ -86,6 +86,8 @@ describe('handles and urls', () => {
     expect(socialHref('youtube', '@chan')).toBe('https://youtube.com/@chan')
     expect(socialHref('linkedin', 'linkedin.com/in/me')).toBe('https://linkedin.com/in/me')
     expect(socialHref('whatsapp', '+91 98000 00000')).toBe('https://wa.me/919800000000')
+    expect(socialHref('instagram', '@thedesignsquare.in')).toBe('https://instagram.com/thedesignsquare.in')
+    expect(socialHref('instagram', 'instagram.com/me')).toBe('https://instagram.com/me')
     expect(socialHref('website', '')).toBeNull()
   })
 })
