@@ -54,3 +54,8 @@ export function subscribeEvents(listener: () => void) {
 export function clearEvents() {
   clearLocalEvents()
 }
+
+/** Events built but not yet handed to the transport (the outbox). */
+export function pendingEvents() {
+  return getTracker().pending()
+}
