@@ -1,16 +1,20 @@
 /* Hallmark · shape: Map / Diagram · genre: modern-minimal · theme: Dose (by request) · job: sign up · draw: 0e94bb
- * hero: Settled · nav: edge-aligned, the wordmark and sign in with one action (swapped from search-led bar: LinkUp has nothing to search) · footer: colophon block · imagery: the product, the real ProfileView rendered in preview mode, no photographs · signature: the real public page, scrollable, in a phone standing on Dose plastic · dose: white
+ * hero: Settled · nav: edge-aligned, the wordmark and sign in with one action (swapped from search-led bar: LinkUp has nothing to search) · footer: colophon block, the builder's credit under it · imagery: the product, the real ProfileView rendered in preview mode, no photographs · signature: the real public page, scrollable, in a phone standing on Dose plastic · dose: white
  * axes: light/grotesk-sans/chromatic-green · posture: committed · contrast: pass · fold: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, a link-in-bio page could look like any; the hero shows the real demo page and the map traces a visit from a bio to a counted tap */
 /* Hallmark · waive 47b · one phone frame per screen, the real ProfileView inside · the public page is a phone page, so the frame is the size it lives at */
 /* Hallmark · hero-review: subagent, fresh context · fix · 5 findings · 4 resolved (headline now LinkUp's own, label states 4 links of room for 8, phone foot fades to paper, label off the bio on phones) · 1 declined: tint names in the cells, cut off behind the phone */
+/* Hallmark · responsive: checked at 360, 390, 412, 768 and 1440 · phones set the look phone above its tray and every key at 44px, tablets set the tray beside the phone, the hero head steps up to the display size, sign in stays in the nav to 336px · seams on phones take one step off each side */
 /* Hallmark · finish-review: subagent, fresh context · fix · 8 findings · 7 resolved (statement on the ink band, tray fills the phone height, child-only segmented selectors, product look names, heads from the facts) · 1 declined: text-wrap balance stays, sloplint F3 asks for it */
 
 /* Tokens and base are global (src/styles); this file is the landing page only. */
 
 .landing { min-height: 100dvh; color: var(--color-ink); }
-.landing .skip { position: absolute; left: var(--space-md); top: calc(-1 * var(--space-3xl)); z-index: var(--z-toast); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-input); background: var(--color-ink); color: var(--color-paper); }
+.landing .skip { position: absolute; left: var(--space-md); top: calc(-1 * var(--space-3xl)); z-index: var(--z-toast); display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-md); border-radius: var(--radius-input); background: var(--color-ink); color: var(--color-paper); }
 .landing .skip:focus-visible { top: var(--space-md); }
+/* A phone held sideways puts its notch over the gutter; the gutter grows to clear it. */
+.landing .lead { text-wrap: pretty; }
+.landing .container { padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right)); }
 
 /* ---------- nav: edge-aligned ---------- */
 
@@ -22,7 +26,8 @@
   border-radius: 6px; color: var(--color-ink-2); font-weight: 500; text-decoration: none; white-space: nowrap;
   transition: color var(--dur-micro) var(--ease-out);
 }
-.lnav__link:hover { color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-accent); text-underline-offset: 0.25em; }
+.lnav .wordmark, .lfoot .wordmark { min-height: 44px; }
+@media (hover: hover) { .lnav__link:hover { color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-accent); text-underline-offset: 0.25em; } }
 .lnav__link:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .lnav__link:active { color: var(--color-accent-deep); }
 
@@ -62,7 +67,7 @@
 }
 .phone[data-slot] { overflow: visible; background: var(--color-ink); }
 .phone__screen {
-  height: 100%; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
+  height: 100%; overflow-x: clip; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
   border-radius: 38px; background: var(--color-paper);
 }
 .phone__screen::-webkit-scrollbar { display: none; }
@@ -136,7 +141,7 @@
 .asks__rows { grid-column: 5 / 13; margin: 0; border-top: 1px solid var(--color-rule); }
 .asks__row { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 5fr); gap: var(--space-xs) var(--gap-columns); align-items: baseline; padding-block: var(--space-lg); border-bottom: 1px solid var(--color-rule); }
 .asks__row dt { font: var(--display-weight) var(--text-title) / 1.2 var(--font-display); letter-spacing: var(--tracking-display); text-wrap: balance; }
-.asks__row dd { margin: 0; color: var(--color-ink-2); }
+.asks__row dd { margin: 0; color: var(--color-ink-2); text-wrap: pretty; }
 
 /* ---------- the look tray, with the page answering live ---------- */
 
@@ -167,7 +172,7 @@
 .counts__table th, .counts__table td { padding: var(--space-md) var(--space-lg) var(--space-md) 0; border-bottom: 1px solid var(--color-rule); text-align: left; vertical-align: baseline; }
 .counts__table thead th { padding-block: var(--space-sm); font-size: var(--text-sm); font-weight: 500; color: var(--color-muted); white-space: nowrap; }
 .counts__table tbody th { width: 44%; font: var(--display-weight) var(--text-title) / 1.2 var(--font-display); letter-spacing: var(--tracking-display); }
-.counts__table tbody td { color: var(--color-ink-2); }
+.counts__table tbody td { color: var(--color-ink-2); text-wrap: pretty; }
 
 /* ---------- the statement ---------- */
 
@@ -192,17 +197,30 @@
 
 /* ---------- footer: colophon block ---------- */
 
-.lfoot { padding-block: var(--space-3xl) var(--space-2xl); border-top: 1px solid var(--color-rule); }
+.lfoot { padding-block: var(--space-3xl) calc(var(--space-2xl) + env(safe-area-inset-bottom)); border-top: 1px solid var(--color-rule); }
 .lfoot__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--space-lg) var(--gap-columns); align-items: start; }
 .lfoot__grid > .wordmark { grid-column: 1 / 4; justify-self: start; }
 .lfoot__colophon { grid-column: 4 / 10; max-width: 60ch; color: var(--color-ink-2); }
+.lfoot__colophon p { margin: 0; }
+.lfoot__credit { margin-top: var(--space-sm); }
+/* The builder's credit: one quiet line under the colophon, a step smaller, the mark muted. */
+.lfoot__credit a {
+  display: inline-flex; align-items: center; gap: var(--space-xs); min-height: 44px; border-radius: 4px;
+  color: var(--color-ink-2); font-size: var(--text-sm); text-decoration: none;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+.lfoot__credit svg { flex-shrink: 0; color: var(--color-muted); }
+.lfoot__credit a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.lfoot__credit a:active { color: var(--color-accent-deep); }
 .lfoot__links { grid-column: 10 / 13; display: grid; justify-items: start; }
 .lfoot__links a {
   display: inline-flex; align-items: center; min-height: 44px; border-radius: 4px;
   color: var(--color-ink); text-decoration: none; white-space: nowrap;
   transition: color var(--dur-micro) var(--ease-out);
 }
-.lfoot__links a:hover { text-decoration: underline; text-decoration-color: var(--color-accent); text-underline-offset: 0.25em; }
+@media (hover: hover) {
+  .lfoot__links a:hover, .lfoot__credit a:hover { color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-accent); text-underline-offset: 0.25em; }
+}
 .lfoot__links a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .lfoot__links a:active { color: var(--color-accent-deep); }
 
@@ -211,34 +229,66 @@
 @media (max-width: 60rem) {
   .hero { min-height: 0; padding-block: var(--space-lg) var(--space-2xl); }
   .hero__grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
+  .hero__text h1 { max-width: 12ch; font-size: var(--text-display); }
   .hero__stage { height: 600px; justify-items: center; }
   .hero__device { margin-left: 0; height: 100%; }
+  .split-head { margin-bottom: var(--space-xl); }
   .split-head h2, .split-head .lead { grid-column: 1 / -1; }
+  /* The map reads top to bottom: a step's name, its nodes, a dashed step down to the next. */
   .map__diagram { grid-template-columns: minmax(0, 1fr); }
   .map__col { grid-template-rows: auto auto; gap: var(--space-sm); }
   .map__nodes { gap: var(--space-xs); }
+  .map__nodes:has(.map__node--source), .map__nodes:has(.map__node--link) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .map__gap { position: relative; height: var(--space-xl); }
   .map__gap::before { content: ""; position: absolute; left: 50%; top: var(--space-xs); bottom: var(--space-xs); border-left: 2px dashed var(--color-accent); }
   .map__edges { display: none; }
-  .map__legend { order: -1; }
+  .map__legend { order: -1; color: var(--color-ink-2); font-weight: 500; }
+  .rx.map__node--record { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .asks__title, .asks__rows { grid-column: 1 / -1; }
-  .looks__side, .looks__stage { grid-column: 1 / -1; }
-  .looks__stage { height: 600px; }
+  /* Tablet: the head over both, the tray beside the phone, so a tap shows on the page next to it. */
+  .looks__grid { grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-xl) var(--gap-columns); }
+  .looks__side { display: contents; }
+  .looks__head { grid-column: 1 / -1; }
+  .looks__tray { grid-column: 1; grid-row: 2; align-self: stretch; align-content: center; padding: var(--space-lg); }
+  .looks__stage { grid-column: 2; grid-row: 2; height: 560px; }
+  .looks__row { grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); }
+  .looks__row .segmented__option > span { min-height: 44px; }
   .close__text, .close__labels { grid-column: 1 / -1; }
-  .lfoot__grid > .wordmark, .lfoot__colophon, .lfoot__links { grid-column: 1 / -1; }
+  .lfoot { padding-block: var(--space-2xl) calc(var(--space-xl) + env(safe-area-inset-bottom)); }
+  .lfoot__grid > .wordmark { grid-column: 1 / -1; }
+  .lfoot__colophon { grid-column: 1 / 9; }
+  .lfoot__links { grid-column: 9 / 13; }
 }
 @media (max-width: 40rem) {
-  .lnav__row { min-height: 64px; }
-  .lnav__end { gap: var(--space-sm); }
-  .lnav .btn { --btn-h: 44px; padding-inline: var(--space-md); }
-  .hero__stage { height: 540px; }
-  .hero__tray { gap: var(--space-2xs); }
-  .map__node--source + .map__node--source { margin: 0; }
-  .map__nodes:has(.map__node--source) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .asks__row { grid-template-columns: minmax(0, 1fr); }
-  .looks__tray { padding: var(--space-lg) var(--space-md); }
-  .looks__row { grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); }
-  .looks__stage { height: 560px; }
+  .lnav__row { min-height: 64px; gap: var(--space-sm); }
+  .lnav__end { gap: var(--space-xs); }
+  .lnav .btn { --btn-h: 44px; padding-inline: var(--space-sm); }
+  .hero { padding-block: var(--space-md) var(--space-lg); }
+  .hero__text { gap: var(--space-md); }
+  .hero__text h1 { font-size: calc(6.4vw + 1.25rem); }
+  /* The two actions share a row when they fit and take the full width when they wrap: big, and near the thumb. */
+  .hero__actions .btn, .close__actions .btn { flex: 1 1 auto; padding-inline: var(--space-md); }
+  .hero__stage { height: clamp(480px, 140vw, 540px); }
+  .hero__tray { gap: var(--space-2xs); height: 28%; }
+  .hero__label { display: none; }
+  .map__nodes:has(.map__node--link), .rx.map__node--record { grid-template-columns: minmax(0, 1fr); }
+  .asks__row { grid-template-columns: minmax(0, 1fr); padding-block: var(--space-md); }
+  /* Two paddings meet at every seam; on a phone each side gives a step so a seam reads as 112 to 128px, not 168. */
+  .map, .asks { padding-block: var(--section-gap) var(--section-gap-s); }
+  .looks { padding-block: var(--section-gap-s); }
+  .close { padding-block: var(--section-gap-s) var(--section-gap); }
+  /* Phone: the page first, the controls under it at thumb height, every key a full-width 44px target. */
+  .looks__grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-lg); }
+  .looks__stage { grid-column: 1; grid-row: 2; height: clamp(480px, 140vw, 540px); }
+  .looks__tray { grid-column: 1; grid-row: 3; gap: var(--space-sm); padding: var(--space-md) var(--space-xs); }
+  .looks__row { grid-template-columns: 4.5rem minmax(0, 1fr); }
+  .looks__row:has(.looks__tints) { grid-template-columns: minmax(0, 1fr); }
+  .looks__label { padding-inline-start: var(--space-2xs); }
+  .looks__row .segmented { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); justify-self: stretch; }
+  .looks__row .segmented__option > span { justify-content: center; width: 100%; min-height: 44px; padding-inline: var(--space-2xs); }
+  /* Seven swatches across a 360px phone: no gap and no inset, so each key keeps a 44px square. */
+  .looks__row .looks__tints { gap: 0; padding: 0; }
+  .looks__value { display: inline; margin-left: var(--space-2xs); }
   .counts__table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .counts__table tr { display: grid; gap: var(--space-2xs); padding-block: var(--space-md); border-bottom: 1px solid var(--color-rule); }
   .counts__table th, .counts__table td { width: auto; padding: 0; border: 0; }
@@ -247,9 +297,11 @@
   .close__label:nth-child(n) { transform: none; }
   .rx { width: 176px; padding: var(--space-sm) var(--space-sm) var(--space-lg); }
   .rx__name { font-size: var(--text-sm); }
-  .hero__label { display: none; }
+  .lfoot__grid { gap: var(--space-md) var(--gap-columns); }
+  .lfoot__colophon, .lfoot__links { grid-column: 1 / -1; }
+  .lfoot__links { display: flex; flex-wrap: wrap; column-gap: var(--space-md); }
 }
-@media (max-width: 24rem) {
-  .lnav__link { display: none; }
-  .hero__stage { height: 500px; }
+/* Under 336px the wordmark keeps its mark and its name for screen readers, so sign in still fits. */
+@media (max-width: 21rem) {
+  .lnav .wordmark > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }

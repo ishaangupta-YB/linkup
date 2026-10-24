@@ -26,7 +26,7 @@ export function Hero() {
               Make your page
             </ButtonLink>
             <ButtonLink to={`/${DEMO_ACCOUNT.handle}`} variant="secondary" onClick={() => track('landing_cta_clicked', { cta: 'hero_demo_page' })}>
-              Open a live page
+              See the demo page
             </ButtonLink>
           </div>
         </div>
